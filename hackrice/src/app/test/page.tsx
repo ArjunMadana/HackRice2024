@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-// Define the type of the data expected from the API
 interface Post {
   userId: number;
   id: number;
@@ -11,14 +10,14 @@ interface Post {
 }
 
 export default function TestPage() {
-  const [data, setData] = useState<Post | null>(null); // Use the Post type
+  const [data, setData] = useState<Post | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const response = await fetch(
         "https://jsonplaceholder.typicode.com/posts/1"
       );
-      const result: Post = await response.json(); // Explicitly type the result as Post
+      const result: Post = await response.json();
       setData(result);
     }
 
@@ -30,7 +29,7 @@ export default function TestPage() {
       <h1>Test Page</h1>
       {data ? (
         <div>
-          <h2>{data.title}</h2> {/* No more TypeScript error */}
+          <h2>{data.title}</h2>
           <p>{data.body}</p>
         </div>
       ) : (

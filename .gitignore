@@ -1,0 +1,36 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/hackrice/node_modules
+/hackrice//.pnp
+/hackrice/.pnp.js
+/hackrice/.yarn/install-state.gz
+
+# testing
+/hackrice//coverage
+
+# next.js
+/hackrice//.next/
+/hackrice//out/
+
+# production
+/hackrice//build
+
+# misc
+/hackrice/.DS_Store
+/hackrice/*.pem
+
+# debug
+/hackrice/npm-debug.log*
+/hackrice/yarn-debug.log*
+/hackrice/yarn-error.log*
+
+# local env files
+/hackrice/.env*.local
+
+# vercel
+/hackrice/.vercel
+
+# typescript
+/hackrice/*.tsbuildinfo
+/hackrice/next-env.d.ts

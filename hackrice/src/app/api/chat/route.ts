@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
             "estimated_time_to_master": "string" // Approximate time to cover the topic
           }
     
-          Please ensure the response strictly follows the JSON format and provide clear, concise steps or subtopics. Do not include any additional comments.
+          Please ensure the response strictly follows the JSON format and provide clear, concise steps or subtopics. Do not include any additional comments. PROVIDE 8 SUBTOPICS.
           
           Now, respond according to the input provided: "${topic}"`,
         },

@@ -27,11 +27,14 @@ export default function Model() {
 
   // Define the positions of the markers
   const pointerPositions = [
-    new Vector3(0.75, 0.25, 1.75), // Pointer 1 Position
-    new Vector3(0, 0.75, 0), // Pointer 1 Position
-    new Vector3(2, 1.4, 0), // Pointer 2 Position
-    new Vector3(1, 1.25, -1), // Pointer 3 Position
-    new Vector3(1.6, 2.45, -2), // Pointer 4 Position
+    new Vector3(0.75, 0.25, 1.75), 
+    new Vector3(0.5, 0.75, 1), 
+    new Vector3(0, 0.75, 0), 
+    new Vector3(1, 0.9, 0), 
+    new Vector3(2, 1.4, 0), 
+    new Vector3(2, 2.2, -.7), 
+    new Vector3(1.5, 1.75, -1.25), 
+    new Vector3(1.6, 2.45, -2), 
   ];
 
   // Create a smooth curve between the marker positions using CatmullRomCurve3

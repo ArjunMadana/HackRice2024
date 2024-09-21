@@ -1,7 +1,8 @@
 import { useGLTF, OrbitControls } from "@react-three/drei";
 import { useRef } from "react";
 import { Group, Vector3, CatmullRomCurve3 } from "three";
-import { useThree } from "@react-three/fiber";
+import { useThree, useLoader } from "@react-three/fiber";
+import { TextureLoader } from "three";
 import { useSpring, animated } from "@react-spring/three"; // Spring animation
 
 // Preload all models
@@ -19,7 +20,7 @@ export default function Model() {
   const cloudRing = useGLTF("/clouds.glb");
   const terrain = useGLTF("/terrain.glb");
 
-  const { camera } = useThree(); // Get the camera reference
+  const { scene, camera } = useThree(); // Get the camera reference
 
   const pointerPositions = [
     new Vector3(0.75, 0.25, 1.75),
@@ -33,6 +34,11 @@ export default function Model() {
   ];
 
   const curve = new CatmullRomCurve3(pointerPositions);
+
+  const skyTexture = useLoader(TextureLoader, "/sky2.jpg");
+
+  // Set the sky texture as the scene background
+  scene.background = skyTexture;
 
   // Create spring animation for the cloud ring
   const cloudRingSpring = useSpring({
@@ -55,10 +61,7 @@ export default function Model() {
           position={[0, 1.5, 0]}
           scale={[50, 30, 50]}
         />{" "}
-        {/* Adjust position below the mountain */}
-        {/* Mountain Model */}
         <primitive object={mountain.scene} /> {/* Render the mountain */}
-        {/* Map Pointers */}
         {pointerPositions.map((pos, idx) => (
           <primitive
             key={idx}
@@ -70,20 +73,14 @@ export default function Model() {
         {/* Tube */}
         <mesh>
           <tubeGeometry attach="geometry" args={[curve, 64, 0.02, 8, false]} />{" "}
-          {/* Tube geometry with thickness */}
           <meshBasicMaterial attach="material" color="yellow" />
         </mesh>
-        {/* Cloud Ring Model with Animation */}
-        <primitive
-          object={cloudRing.scene}
-          position={[5, 25, -1.25]} // Position above the mountain
-          scale={[3, 3, 3]} // Adjust scale as needed
-        />
       </animated.group>
 
-      {/* Orbit Controls */}
       <OrbitControls
         enablePan={true} // Enable panning
+        minDistance={3} // Set a minimum distance (for zoom in)
+        maxDistance={15} // Set a maximum distance (for zoom out)
         onChange={() => {
           camera.position.y = 2; // Set a fixed Y position for the camera (adjust as needed)
         }}

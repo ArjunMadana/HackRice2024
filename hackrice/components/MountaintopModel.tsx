@@ -1,38 +1,41 @@
 import { useGLTF, OrbitControls, Html } from "@react-three/drei";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect} from "react";
 import { Group, Vector3, CatmullRomCurve3 } from "three";
 import { useThree, useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { useSpring, animated } from "@react-spring/three"; // Spring animation
+import * as THREE from 'three';
 
 // Preload all models
 // Volcano by Poly by Google [CC-BY] via Poly Pizza
-useGLTF.preload("/volcano.glb");
+useGLTF.preload("/mountaintop.glb");
 useGLTF.preload("/mappointer.glb");
 useGLTF.preload("/cloud_ring.glb");
-useGLTF.preload("/valleyterrain.glb");
+useGLTF.preload("/rivervalley.glb");
 
 export default function Model() {
   const group = useRef<Group>(null);
 
   // Load the models
-  const modelfile = useGLTF("/volcano.glb");
+  const modelfile = useGLTF("/mountaintop.glb");
   const mapPointer = useGLTF("/mappointer.glb");
   const cloudRing = useGLTF("/clouds.glb");
-  const terrain = useGLTF("/valleyterrain.glb");
+  const terrain = useGLTF("/rivervalley.glb");
 
+  // Store the original colors of the meshes to avoid cumulative tinting
+  const originalColors = useRef(new Map()); // Use a map to store colors by mesh ID
   const { scene, camera } = useThree(); // Get the camera reference
   const [clickedPointer, setClickedPointer] = useState(null); // State for the clicked pointer
 
   const pointerPositions = [
-    new Vector3(1.8, 0.35, 1.8),
-    new Vector3(2, 1.1, 0.5),
-    new Vector3(0.95, 1.2, 1.2),
-    new Vector3(-0.3, 0.7, 0.7),
-    new Vector3(-0.9, 1.15, 0),
-    new Vector3(-0.25, 1.7, -0.05),
-    new Vector3(0.9, 2.3, -0.3),
-    new Vector3(1.2, 2.9, -0.6),
+    new Vector3(0.4, 0.3, 1.6),
+    new Vector3(1.3, 0.35, 1),
+    new Vector3(1.3, 1, 0),
+    new Vector3(0.6, 1.2, 0),
+    new Vector3(0.3, 1.7, -0.6),
+    new Vector3(0.7, 2.1, -0.9),
+    new Vector3(0.9, 2.6, -1.7),
+    new Vector3(0.5, 3.1, -2.2),
   ];
 
   const curve = new CatmullRomCurve3(pointerPositions);
@@ -47,13 +50,37 @@ export default function Model() {
     setClickedPointer(clickedPointer === idx ? null : idx);
   };
 
+  useEffect(() => {
+    modelfile.scene.traverse((child) => {
+      if (child.isMesh) {
+        // Store the original color once if it's not already stored
+        if (!originalColors.current.has(child.uuid)) {
+          originalColors.current.set(child.uuid, child.material.color.clone());
+        }
+
+        // Get the stored original color
+        const originalColor = originalColors.current.get(child.uuid);
+
+        // Set the tint color
+        const tintColor = new THREE.Color(0x919c76);
+
+        // Blend the tint color with the original color (lerp amount between 0 and 1)
+        const blendedColor = originalColor.clone().lerp(tintColor, 0); // 30% tint
+
+        // Apply the blended color back to the material
+        child.material.color.copy(blendedColor);
+      }
+    });
+  }, [modelfile]);
+
   return (
     <>
       {/* Terrain Model */}
       <primitive
         object={terrain.scene}
-        position={[0, -1.75, -4]}
-        scale={[0.75/10, 0.4/15, 0.75/10]}
+        position={[-0.5, -1.75, 2.7]}
+        rotation={[0, 1, 0]}
+        scale={[1.3, 0.6, 1.3]}
       />{" "}
       <animated.group
         ref={group}
@@ -62,9 +89,9 @@ export default function Model() {
       >
         <primitive object={modelfile.scene} 
           // Rotation, position, and scale for the mountain model
-          rotation={[0, 0.8, 0]}
-          position={[1.2, 0.93, -0.85]}
-          scale={[3, 3, 3]}
+          rotation={[0, -1.8, 0]}
+          position={[1.2, 0.89, -0.95]}
+          scale={[8, 8, 10]}
         /> {/* Render the mountain */}
         {pointerPositions.map((pos, idx) => (
           <group key={idx} position={pos} onClick={() => handleClick(idx)}>

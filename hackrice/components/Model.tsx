@@ -1,6 +1,13 @@
 import { useGLTF, OrbitControls, Html } from "@react-three/drei";
 import { useRef, useState } from "react";
-import { Group, Vector3 } from "three";
+import {
+  Group,
+  Vector3,
+  CatmullRomCurve3,
+  TubeGeometry,
+  MeshBasicMaterial,
+  Mesh,
+} from "three";
 import { useSpring, animated } from "@react-spring/three"; // For animations
 import { useThree } from "@react-three/fiber"; // For camera controls
 
@@ -18,26 +25,20 @@ export default function Model() {
   const [clickedPointer, setClickedPointer] = useState<number | null>(null); // Track which pointer is clicked
   const { camera } = useThree(); // Get the camera reference
 
-  // Function to calculate the required rotation for a clicked pointer
-  function getRotationForPointer(
-    pointerIndex: number
-  ): [number, number, number] {
-    const pointerPositions = [
-      new Vector3(0, 0.75, 0), // Position of Pointer 1
-      new Vector3(-1, 1, 0), // Position of Pointer 2
-    ];
+  // Define the positions of the markers
+  const pointerPositions = [
+    new Vector3(0.75, 0.25, 1.75), // Pointer 1 Position
+    new Vector3(0, 0.75, 0), // Pointer 1 Position
+    new Vector3(2, 1.4, 0), // Pointer 2 Position
+    new Vector3(1, 1.25, -1), // Pointer 3 Position
+    new Vector3(1.6, 2.45, -2), // Pointer 4 Position
+  ];
 
-    const pointerPosition = pointerPositions[pointerIndex];
+  // Create a smooth curve between the marker positions using CatmullRomCurve3
+  const curve = new CatmullRomCurve3(pointerPositions);
 
-    // Calculate the angle around the Y-axis to face the marker
-    const angleToPointer = Math.atan2(
-      pointerPosition.x - camera.position.x,
-      pointerPosition.z - camera.position.z
-    );
-
-    // Convert the angle to Euler angles for rotation
-    return [0, angleToPointer, 0]; // Only rotating around Y-axis (up axis)
-  }
+  // Create TubeGeometry for a thicker line
+  const tubeGeometry = new TubeGeometry(curve, 64, 0.05, 8, false); // Tube with radius 0.05
 
   // Spring animation for rotating the mountain
   const { rotation } = useSpring({
@@ -64,24 +65,39 @@ export default function Model() {
       <animated.group
         ref={group}
         rotation={rotation} // Apply animated rotation
-        position={[0, -1.5, 0]} // Adjust the position of the entire group (Mountain and Pointers)
+        position={[-1.75, -1.75, 0]} // Adjust the position of the entire group (Mountain and Pointers)
+        scale={[1.5, 1.5, 1.5]}
       >
         {/* Mountain Model */}
         <primitive object={mountain.scene} /> {/* Render the mountain */}
         {/* Map Pointers */}
-        <primitive
-          object={mapPointer.scene}
-          position={[0, 0.75, 0]} // Pointer 1 Position
-          scale={[0.1, 0.1, 0.1]} // Keep the scale constant
-          onClick={() => handlePointerClick(0)} // Rotate mountain on click
-        />
+        {pointerPositions.map((pos, idx) => (
+          <primitive
+            key={idx}
+            object={mapPointer.scene.clone()} // Clone the map pointer for each instance
+            position={pos} // Set pointer position
+            scale={[0.1, 0.1, 0.1]} // Keep the scale constant
+            onClick={() => handlePointerClick(idx)} // Rotate mountain on click
+          />
+        ))}
+        {/* Thicker Curved Line connecting the pointers using TubeGeometry */}
+        <mesh>
+          <tubeGeometry attach="geometry" args={[curve, 64, 0.02, 8, false]} />{" "}
+          {/* Tube geometry with thickness */}
+          <meshBasicMaterial attach="material" color="yellow" />
+        </mesh>
       </animated.group>
+
       {/* Orbit Controls */}
       <OrbitControls
         enableZoom={clickedPointer === null}
-        enablePan={clickedPointer === null}
-      />{" "}
-      {/* Disable orbit controls when zoomed */}
+        enablePan={true} // Enable panning
+        onChange={() => {
+          // Lock Y-axis for horizontal-only panning
+          camera.position.y = 2; // Set a fixed Y position for the camera (adjust as needed)
+        }}
+      />
+
       {/* Reset View Button (appears when a pointer is clicked) */}
       {clickedPointer !== null && (
         <Html position={[0, 0, 0]} center>

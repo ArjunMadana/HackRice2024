@@ -1,6 +1,106 @@
 import Scene from "../../components/Scene";
 
+interface Goal {
+  topic: string;
+  subtopics: string[];
+  learningPath: string;
+  estimatedTime: string;
+}
+
 export default function Page() {
+<<<<<<< Updated upstream
+=======
+  const [inputValue, setInputValue] = useState("");
+  const [query, setQuery] = useState<string | null>(null);
+  const { reset } = useQueryErrorResetBoundary();
+  const [goals, setGoals] = useState<Goal[]>([]);
+
+  const router = useRouter();
+
+  const fetchChatResponse = async () => {
+    if (!query) return null; // Prevent fetching if query is not set
+    const response = await axios.post("/api/chat", { topic: query });
+    return response.data;
+  };
+
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["chatData", query],
+    queryFn: fetchChatResponse,
+    enabled: !!query, // Only run the query if `query` is not null
+    retry: false, // Disable automatic retry
+  });
+
+  const handleSubmit = () => {
+    if (inputValue.trim() !== "") {
+      setQuery(inputValue); // Trigger the useQuery hook to fetch data
+      refetch(); // Manually trigger the fetch
+    }
+  };
+
+  // Handle submission with Enter key
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter" && inputValue.trim() !== "") {
+      handleSubmit();
+    }
+  };
+
+  // Reset the error state when the input value changes
+  useEffect(() => {
+    if (isError) {
+      reset();
+    }
+  }, [inputValue, reset, isError]);
+
+  // Redirect to /mountain when data is successfully fetched
+  useEffect(() => {
+    if (data && !error) {
+      const structuredResponse = data.structuredResponse;
+
+      if (structuredResponse) {
+        const saveGoal = async () => {
+          try {
+            const res = await fetch("/api/goals", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                topic: structuredResponse.topic,
+                subtopics: structuredResponse.subtopics,
+                learningPath: structuredResponse.learning_path,
+                estimatedTime: structuredResponse.estimated_time_to_master,
+              }),
+            });
+
+            if (!res.ok) {
+              throw new Error(`Error saving goal: ${res.status}`);
+            }
+
+            const newGoal = await res.json();
+            console.log("New goal saved:", newGoal);
+          } catch (error) {
+            console.error("Error saving goal:", error);
+          }
+        };
+
+        saveGoal();
+
+        // Redirect to /mountain
+        const queryParams = new URLSearchParams({
+          topic: structuredResponse.topic,
+          subtopics: JSON.stringify(structuredResponse.subtopics),
+          learningPath: JSON.stringify(structuredResponse.learning_path),
+          estimatedTime: structuredResponse.estimated_time_to_master,
+        }).toString();
+
+        router.push(`/mountain?${queryParams}`);
+      } else {
+        console.error("structuredResponse is undefined in the API response");
+      }
+    }
+  }, [data, error, router]);
+
+>>>>>>> Stashed changes
   return (
     <>
       <div className="h-screen flex flex-col pb-6">

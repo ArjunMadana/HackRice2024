@@ -12,6 +12,7 @@
     "@react-three/drei": "^9.0.1",
     "@react-three/fiber": "^8.17.7",
     "@react-three/postprocessing": "^2.16.2",
+    "bootstrap-icons": "^1.11.3",
     "next": "14.2.13",
     "openai": "^4.63.0",
     "react": "^18",

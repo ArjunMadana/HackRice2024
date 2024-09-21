@@ -17,6 +17,7 @@
     "openai": "^4.63.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-icons": "^5.3.0",
     "three": "^0.168.0"
   },
   "devDependencies": {

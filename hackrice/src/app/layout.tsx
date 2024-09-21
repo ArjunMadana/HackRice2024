@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Heading from "../../components/Heading";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,6 +29,39 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "20px", // Align to the left instead of right
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between", // Space between items
+            alignItems: "center",
+            width: "100%", // Take full width to separate left and right elements
+            paddingRight: "20px", // Add padding to the right to avoid overflow
+          }}
+        >
+          {/* Left: Current Goal */}
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "20px 20px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              fontFamily: "var(--font-geist-sans)",
+              fontWeight: 600,
+              color: "#333",
+            }}
+            className="text-2xl"
+          >
+            Current Goal: Take out the trash
+          </div>
+          <div className="mr-1">
+          <Heading />
+          </div>
+        </div>
+
         {children}
       </body>
     </html>

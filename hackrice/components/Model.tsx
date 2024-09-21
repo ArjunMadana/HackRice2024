@@ -100,12 +100,12 @@ export default function Model() {
       {/* Terrain Model */}
       <primitive
         object={terrain.scene}
-        position={[-1.65, -2.25, -1.4]}
+        position={[-1.65, -1.6, -1.4]}
         scale={[0.75, 0.4, 0.75]}
       />{" "}
       <animated.group
         ref={group}
-        position={[-1.75, -2.25, 0]} // Adjust the position of the entire group (Mountain, Terrain, and Pointers)
+        position={[-1.75, -1.6, 0]} // Adjust the position of the entire group (Mountain, Terrain, and Pointers)
         scale={[1.5, 1.5, 1.5]}
       >
         <primitive object={mountain.scene} /> {/* Render the mountain */}

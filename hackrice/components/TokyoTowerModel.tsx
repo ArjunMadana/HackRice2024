@@ -33,7 +33,7 @@ export default function Model() {
     new Vector3(1.4, 1.7, -0.5),
     new Vector3(1, 2.2, -0.6),
     new Vector3(1.3, 2.6, -0.6),
-    new Vector3(1.2, 3.25, -0.8),
+    new Vector3(1.17, 3.25, -0.81),
     new Vector3(1.7, 3.3, -0.85),
   ];
 

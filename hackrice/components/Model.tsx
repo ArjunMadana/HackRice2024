@@ -1,118 +1,110 @@
 import { useGLTF, OrbitControls, Html } from "@react-three/drei";
 import { useRef, useState } from "react";
-import {
-  Group,
-  Vector3,
-  CatmullRomCurve3,
-  TubeGeometry,
-  MeshBasicMaterial,
-  Mesh,
-} from "three";
-import { useSpring, animated } from "@react-spring/three"; // For animations
-import { useThree } from "@react-three/fiber"; // For camera controls
+import { Group, Vector3, CatmullRomCurve3 } from "three";
+import { useThree, useLoader } from "@react-three/fiber";
+import { TextureLoader } from "three";
+import { useSpring, animated } from "@react-spring/three"; // Spring animation
 
-// Preload both models
+// Preload all models
 useGLTF.preload("/mountain.glb");
 useGLTF.preload("/mappointer.glb");
+useGLTF.preload("/cloud_ring.glb");
+useGLTF.preload("/terrain.glb");
 
 export default function Model() {
   const group = useRef<Group>(null);
 
-  // Load the mountain and the map pointer models
+  // Load the models
   const mountain = useGLTF("/mountain.glb");
   const mapPointer = useGLTF("/mappointer.glb");
+  const cloudRing = useGLTF("/clouds.glb");
+  const terrain = useGLTF("/forest.glb");
 
-  const [clickedPointer, setClickedPointer] = useState<number | null>(null); // Track which pointer is clicked
-  const { camera } = useThree(); // Get the camera reference
+  const { scene, camera } = useThree(); // Get the camera reference
+  const [clickedPointer, setClickedPointer] = useState(null); // State for the clicked pointer
 
-  // Define the positions of the markers
   const pointerPositions = [
-    new Vector3(0.75, 0.25, 1.75), // Pointer 1 Position
-    new Vector3(0, 0.75, 0), // Pointer 1 Position
-    new Vector3(2, 1.4, 0), // Pointer 2 Position
-    new Vector3(1, 1.25, -1), // Pointer 3 Position
-    new Vector3(1.6, 2.45, -2), // Pointer 4 Position
+    new Vector3(0.75, 0.25, 1.75),
+    new Vector3(0.5, 0.75, 1),
+    new Vector3(0, 0.75, 0),
+    new Vector3(1, 0.9, 0),
+    new Vector3(2, 1.4, 0),
+    new Vector3(2, 2.2, -0.7),
+    new Vector3(1.5, 1.75, -1.25),
+    new Vector3(1.6, 2.45, -2),
   ];
 
-  // Create a smooth curve between the marker positions using CatmullRomCurve3
   const curve = new CatmullRomCurve3(pointerPositions);
 
-  // Create TubeGeometry for a thicker line
-  const tubeGeometry = new TubeGeometry(curve, 64, 0.05, 8, false); // Tube with radius 0.05
+  const skyTexture = useLoader(TextureLoader, "/sky2.jpg");
 
-  // Spring animation for rotating the mountain
-  const { rotation } = useSpring({
-    rotation:
-      clickedPointer === null
-        ? [0, 0, 0]
-        : getRotationForPointer(clickedPointer),
-    config: { mass: 1, tension: 170, friction: 26 }, // Smooth rotation
-  });
+  // Set the sky texture as the scene background
+  scene.background = skyTexture;
 
-  // Handle pointer click logic
-  const handlePointerClick = (pointerIndex: number) => {
-    setClickedPointer(pointerIndex); // Mark the clicked pointer
-  };
-
-  // Reset logic to reset the mountain rotation and reset view
-  const resetView = () => {
-    setClickedPointer(null); // Reset clicked pointer state
+  const handleClick = (idx) => {
+    // Toggle the clicked pointer state to show or hide the dialog
+    setClickedPointer(clickedPointer === idx ? null : idx);
   };
 
   return (
     <>
-      {/* Group the mountain and the pointers together */}
+      {/* Terrain Model */}
+      <primitive
+        object={terrain.scene}
+        position={[-1.65, -1.75, -1.4]}
+        scale={[0.75, 0.4, 0.75]}
+      />{" "}
       <animated.group
         ref={group}
-        rotation={rotation} // Apply animated rotation
-        position={[-1.75, -1.75, 0]} // Adjust the position of the entire group (Mountain and Pointers)
+        position={[-1.75, -1.75, 0]} // Adjust the position of the entire group (Mountain, Terrain, and Pointers)
         scale={[1.5, 1.5, 1.5]}
       >
-        {/* Mountain Model */}
         <primitive object={mountain.scene} /> {/* Render the mountain */}
-        {/* Map Pointers */}
         {pointerPositions.map((pos, idx) => (
-          <primitive
-            key={idx}
-            object={mapPointer.scene.clone()} // Clone the map pointer for each instance
-            position={pos} // Set pointer position
-            scale={[0.1, 0.1, 0.1]} // Keep the scale constant
-            onClick={() => handlePointerClick(idx)} // Rotate mountain on click
-          />
+          <group key={idx} position={pos} onClick={() => handleClick(idx)}>
+            <primitive
+              object={mapPointer.scene.clone()} // Clone the map pointer for each instance
+              scale={[0.1, 0.1, 0.1]} // Keep the scale constant
+            />
+            {/* Show the dialog only when the pointer is clicked */}
+            {clickedPointer === idx && (
+              <Html distanceFactor={10} position={[0, 0.75, 0]}>
+                <div
+                  style={{
+                    background: "white",
+                    padding: "12px",
+                    borderRadius: "4px",
+                    boxShadow: "0px 0px 10px rgba(0,0,0,0.5)",
+                    width: "150px", // Narrower width
+                    height: "75px", // Taller height
+                    textAlign: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    fontSize: "10px",
+                  }}
+                >
+                  <p>Dialog for Goal {idx + 1}</p>
+                  <button onClick={() => setClickedPointer(null)}>Close</button>
+                </div>
+              </Html>
+            )}
+          </group>
         ))}
-        {/* Thicker Curved Line connecting the pointers using TubeGeometry */}
+        {/* Tube */}
         <mesh>
           <tubeGeometry attach="geometry" args={[curve, 64, 0.02, 8, false]} />{" "}
-          {/* Tube geometry with thickness */}
           <meshBasicMaterial attach="material" color="yellow" />
         </mesh>
       </animated.group>
-
-      {/* Orbit Controls */}
       <OrbitControls
-        enableZoom={clickedPointer === null}
         enablePan={true} // Enable panning
+        minDistance={3} // Set a minimum distance (for zoom in)
+        maxDistance={12} // Set a maximum distance (for zoom out)
         onChange={() => {
-          // Lock Y-axis for horizontal-only panning
           camera.position.y = 2; // Set a fixed Y position for the camera (adjust as needed)
         }}
       />
-
-      {/* Reset View Button (appears when a pointer is clicked) */}
-      {clickedPointer !== null && (
-        <Html position={[0, 0, 0]} center>
-          <div
-            style={{
-              background: "white",
-              padding: "10px",
-              cursor: "pointer",
-            }}
-            onClick={resetView}
-          >
-            Reset View
-          </div>
-        </Html>
-      )}
     </>
   );
 }

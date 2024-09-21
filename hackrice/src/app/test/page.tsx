@@ -14,9 +14,9 @@ export default function TestPage() {
 
   useEffect(() => {
     async function fetchData() {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/posts/1"
-      );
+      // Call your server-side API route, which fetches data from the third-party API
+      const response = await fetch("/api/third-party");
+      
       const result: Post = await response.json();
       setData(result);
     }

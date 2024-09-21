@@ -1,25 +1,51 @@
-import dbConnect from "../../../../lib/mongodb";
-import Goal from "../../../../models/Goal";
+import { NextResponse } from "next/server";
+import { connectToDatabase } from "@/app/lib/mongodb";
 
-export default async function handler(req, res) {
-  await dbConnect();
+export async function POST(req: Request) {
+  try {
+    const body = await req.json(); // Parse the request body
+    const { topic, subtopics, learningPath, estimatedTime } = body;
 
-  if (req.method === "POST") {
-    try {
-      const { topic, subtopics, learningPath, estimatedTime } = req.body;
-      const newGoal = new Goal({
-        topic,
-        subtopics,
-        learningPath,
-        estimatedTime,
-        progress: 0, // Initialize progress at 0
-      });
-      await newGoal.save();
-      res.status(201).json(newGoal); // Return the saved goal
-    } catch (error) {
-      res.status(500).json({ error: "Failed to save the goal" });
+    // Validation: ensure all required fields are present
+    if (!topic || !subtopics || !learningPath || !estimatedTime) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
     }
-  } else {
-    res.status(405).json({ error: "Method not allowed" });
+
+    // Connect to the MongoDB database
+    const { db } = await connectToDatabase();
+    const newGoal = {
+      topic,
+      subtopics,
+      learningPath,
+      estimatedTime,
+      progress: 0, // Initialize progress to 0
+      createdAt: new Date(),
+    };
+
+    // Insert the new goal into the collection
+    const result = await db.collection("goals").insertOne(newGoal);
+
+    // Return the newly created goal
+    return NextResponse.json(result.ops[0], { status: 201 });
+  } catch (error) {
+    console.error("Error inserting goal:", error);
+    return NextResponse.json({ error: "Failed to add goal" }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const { db } = await connectToDatabase();
+    const goals = await db.collection("goals").find({}).toArray();
+    return NextResponse.json(goals, { status: 200 });
+  } catch (error) {
+    console.error("Failed to fetch goals:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch goals" },
+      { status: 500 }
+    );
   }
 }

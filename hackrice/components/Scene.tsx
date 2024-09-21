@@ -9,10 +9,10 @@ export default function Scene() {
   return (
     <Canvas
       camera={{ position: [0, 2, 10], fov: 45 }} // Camera settings
-      style={{ width: "100%", height: "100vh" }} // Full screen canvas
+      style={{ width: '100%', height: '100vh' }} // Full screen canvas
     >
       <directionalLight position={[-5, -5, 5]} intensity={4} />
-      <ambientLight intensity={0.5} />
+      <ambientLight intensity={2.5} />
       <Suspense fallback={null}>
         <Sky
           distance={450000} // Camera distance

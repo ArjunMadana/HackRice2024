@@ -1,0 +1,313 @@
+{
+  "accessors": [
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 11721,
+      "max": [
+        0.30035215616226196,
+        0.2491554468870163,
+        0.31255072355270386
+      ],
+      "min": [
+        -0.3238792419433594,
+        -0.0005401702364906669,
+        -0.3440108895301819
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 140652,
+      "componentType": 5126,
+      "count": 11721,
+      "max": [
+        0.9606026411056519,
+        0.9998845458030701,
+        0.9509676098823547
+      ],
+      "min": [
+        -0.9674166440963745,
+        -0.6640039682388306,
+        -0.954802930355072
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 11721,
+      "max": [
+        0.8286280035972595,
+        0.6479659080505371
+      ],
+      "min": [
+        0.18661609292030334,
+        0.01966133527457714
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "componentType": 5125,
+      "count": 11721,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 281304,
+      "componentType": 5126,
+      "count": 3690,
+      "max": [
+        0.29656267166137695,
+        0.2491554468870163,
+        0.24631163477897644
+      ],
+      "min": [
+        -0.22347839176654816,
+        -0.00013634935021400452,
+        -0.24527989327907562
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "byteOffset": 325584,
+      "componentType": 5126,
+      "count": 3690,
+      "max": [
+        0.942623496055603,
+        0.9963041543960571,
+        0.9560046195983887
+      ],
+      "min": [
+        -0.9712090492248535,
+        -0.22722916305065155,
+        -0.9346728324890137
+      ],
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 1,
+      "byteOffset": 93768,
+      "componentType": 5126,
+      "count": 3690,
+      "max": [
+        0.6221960783004761,
+        0.9705654978752136
+      ],
+      "min": [
+        0.24557866156101227,
+        0.6932116746902466
+      ],
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 0,
+      "byteOffset": 46884,
+      "componentType": 5125,
+      "count": 3690,
+      "type": "SCALAR"
+    }
+  ],
+  "asset": {
+    "extras": {
+      "author": "Poly Craftsman (https://sketchfab.com/lowpolyartwork)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/low-poly-mountain-free-dabda46f9be2416c93a4b584be17786b",
+      "title": "Low Poly Mountain Free"
+    },
+    "generator": "Sketchfab-16.16.0",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 61644,
+      "name": "floatBufferViews",
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteLength": 123288,
+      "byteOffset": 61644,
+      "byteStride": 8,
+      "name": "floatBufferViews",
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteLength": 369864,
+      "byteOffset": 184932,
+      "byteStride": 12,
+      "name": "floatBufferViews",
+      "target": 34962
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 554796,
+      "uri": "scene.bin"
+    }
+  ],
+  "materials": [
+    {
+      "doubleSided": true,
+      "name": "material",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.12554694619288637,
+          0.12134989851915214,
+          0.1141800593329118,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.982108839980468
+      }
+    },
+    {
+      "doubleSided": true,
+      "name": "material_1",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [
+          0.8,
+          0.8,
+          0.8,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.8211145618000169
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Mountain_A_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 1,
+            "POSITION": 0,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0,
+          "mode": 4
+        }
+      ]
+    },
+    {
+      "name": "Mountain_B_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 5,
+            "POSITION": 4,
+            "TEXCOORD_0": 6
+          },
+          "indices": 7,
+          "material": 1,
+          "mode": 4
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "children": [
+        1
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        -1.0,
+        0.0,
+        0.0,
+        1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "Sketchfab_model"
+    },
+    {
+      "children": [
+        2
+      ],
+      "matrix": [
+        0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.009999999776482582,
+        0.0,
+        0.0,
+        -0.009999999776482582,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "a73fca67422b4366866acaeb7c839162.fbx"
+    },
+    {
+      "children": [
+        3
+      ],
+      "name": "RootNode"
+    },
+    {
+      "children": [
+        4,
+        5
+      ],
+      "matrix": [
+        918.5401611328125,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        918.5401611328002,
+        0.00014964920525260247,
+        0.0,
+        0.0,
+        -0.00014964920525260247,
+        918.5401611328002,
+        0.0,
+        140.0,
+        0.0,
+        -105.11764526367188,
+        1.0
+      ],
+      "name": "Mountain"
+    },
+    {
+      "mesh": 0,
+      "name": "Mountain_A_0"
+    },
+    {
+      "mesh": 1,
+      "name": "Mountain_B_0"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ]
+}

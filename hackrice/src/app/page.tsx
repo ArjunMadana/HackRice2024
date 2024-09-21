@@ -8,8 +8,32 @@ export default function Page() {
   const [inputValue, setInputValue] = useState("");
   const [query, setQuery] = useState<string | null>(null);
   const { reset } = useQueryErrorResetBoundary();
+  const [goals, setGoals] = useState([]);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchGoals = async () => {
+      try {
+        const res = await fetch("/api/goals");
+
+        // Check if the response is ok and has content
+        if (!res.ok) {
+          throw new Error(`Failed to fetch goals: ${res.status}`);
+        }
+
+        // Handle cases where the response body is empty
+        const text = await res.text();
+        const data = text ? JSON.parse(text) : [];
+
+        setGoals(data);
+      } catch (error) {
+        console.error("Error fetching goals:", error);
+      }
+    };
+
+    fetchGoals();
+  }, []);
 
   const fetchChatResponse = async () => {
     if (!query) return null; // Prevent fetching if query is not set
@@ -17,13 +41,7 @@ export default function Page() {
     return response.data;
   };
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["chatData", query],
     queryFn: fetchChatResponse,
     enabled: !!query, // Only run the query if `query` is not null
@@ -54,24 +72,73 @@ export default function Page() {
   // Redirect to /mountain when data is successfully fetched
   useEffect(() => {
     if (data && !error) {
-      router.push("/mountain");
+      console.log("Full API Response:", data);
+
+      const structuredResponse = data.structuredResponse;
+      console.log("Structured Response:", structuredResponse);
+
+      if (structuredResponse) {
+        // Save the structured response to MongoDB
+        const saveGoalToDatabase = async () => {
+          try {
+            const res = await fetch("/api/goals", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                topic: structuredResponse.topic,
+                subtopics: structuredResponse.subtopics,
+                learningPath: structuredResponse.learning_path,
+                estimatedTime: structuredResponse.estimated_time_to_master,
+              }),
+            });
+
+            if (!res.ok) {
+              throw new Error(`Error saving goal: ${res.status}`);
+            }
+
+            const savedGoal = await res.json();
+            console.log("Saved Goal:", savedGoal);
+            setGoals((prevGoals) => [...prevGoals, savedGoal]); // Add saved goal to the state
+          } catch (err) {
+            console.error("Failed to save goal to the database:", err);
+          }
+        };
+
+        saveGoalToDatabase();
+
+        const queryParams = new URLSearchParams({
+          topic: structuredResponse.topic,
+          subtopics: JSON.stringify(structuredResponse.subtopics),
+          learningPath: JSON.stringify(structuredResponse.learning_path),
+          estimatedTime: structuredResponse.estimated_time_to_master,
+        }).toString();
+
+        console.log("Query Params:", queryParams);
+        router.push(`/mountain?${queryParams}`);
+      } else {
+        console.error("structuredResponse is undefined in the API response");
+      }
     }
-  }, [data, router]);
+  }, [data, router, error]);
 
   return (
-    <div className="h-screen flex flex-col pb-6">
+    <div className="h-screen flex flex-col pb-6 animated-slideshow">
       <div className="h-full flex flex-col justify-center">
         <div className="-mt-20 max-w-4xl w-full text-center mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-800 sm:text-4xl dark:text-white">
-            Welcome to Preline AI
-          </h1>
-          <p className="mt-3 text-gray-600 dark:text-neutral-400">
+          <img
+            src="/goalscapes.png"
+            alt="Preline AI"
+            style={{ width: "1000px", height: "475px" }}
+          />{" "}
+          {/* <p className="text-gray-600 dark:text-neutral-400">
             Your AI-powered copilot for the web
-          </p>
+          </p> */}
         </div>
 
         {/* Search */}
-        <div className="mt-10 max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="-mt-10 max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative">
             <input
               type="text"
@@ -79,7 +146,7 @@ export default function Page() {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown} // Handle Enter key press
               className="p-4 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-              placeholder="Ask me anything..."
+              placeholder="Break down your goal or topic..."
               disabled={isLoading}
             />
             <div className="absolute top-1/2 end-2 -translate-y-1/2">
@@ -140,15 +207,19 @@ export default function Page() {
 
         {/* Display the API response, error, or loading state */}
         {/* {data && <div className="mt-6 text-center">Response: {JSON.stringify(data)}</div>} */}
-        
+
         {/* Display error message */}
         {isError && error && (
           <div className="mt-6 text-center text-red-500">
             {error.response?.status === 422 ? (
-              <p>The chat response is not in a valid JSON format. Please try again.</p>
+              <p>
+                The chat response is not in a valid JSON format. Please try
+                again.
+              </p>
             ) : (
               <p>
-                <strong>Error:</strong> {error.response?.data?.error || error.message}
+                <strong>Error:</strong>{" "}
+                {error.response?.data?.error || error.message}
               </p>
             )}
           </div>
@@ -156,8 +227,76 @@ export default function Page() {
       </div>
 
       <footer className="mt-auto max-w-4xl text-center mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-xs text-gray-600 dark:text-neutral-500">HackRice 2024</p>
+        <p className="text-xs text-gray-600 dark:text-neutral-500">
+          HackRice 2024
+        </p>
       </footer>
+
+      <style jsx>{`
+        .animated-slideshow {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .animated-slideshow::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-size: cover;
+          background-position: center;
+          animation: slideshow 20s infinite ease-in-out;
+          z-index: -1; /* Ensure the background is behind the content */
+          background-color: rgba(0, 0, 0, 0.25);
+          background-blend-mode: darken; /* Blend the black overlay with the background */
+        }
+
+        .animated-slideshow::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-size: cover;
+          background-position: center;
+          animation: slideshow 25s infinite ease-in-out,
+            zoom 20s infinite ease-in-out;
+          z-index: -1; /* Ensure the background is behind the content */
+          background-color: rgba(0, 0, 0, 0.25); /* Black overlay */
+          background-blend-mode: darken; /* Blend the black overlay with the background */
+        }
+
+        @keyframes slideshow {
+          0% {
+            background-image: url("/1.png");
+          }
+          25% {
+            background-image: url("/2.png");
+          }
+          50% {
+            background-image: url("/3.png");
+          }
+          75% {
+            background-image: url("/4.png");
+          }
+          100% {
+            background-image: url("/1.png");
+          }
+        }
+
+        @keyframes zoom {
+          0%,
+          100% {
+            transform: scale(1); /* Start and end at normal scale */
+          }
+          50% {
+            transform: scale(1.1); /* Zoom in at the midpoint */
+          }
+        }
+      `}</style>
     </div>
   );
 }

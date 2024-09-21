@@ -1,5 +1,5 @@
-import { useGLTF, OrbitControls } from "@react-three/drei";
-import { useRef } from "react";
+import { useGLTF, OrbitControls, Html } from "@react-three/drei";
+import { useRef, useState } from "react";
 import { Group, Vector3, CatmullRomCurve3 } from "three";
 import { useThree, useLoader } from "@react-three/fiber";
 import { TextureLoader } from "three";
@@ -21,6 +21,7 @@ export default function Model() {
   const terrain = useGLTF("/forest.glb");
 
   const { scene, camera } = useThree(); // Get the camera reference
+  const [clickedPointer, setClickedPointer] = useState(null); // State for the clicked pointer
 
   const pointerPositions = [
     new Vector3(0.75, 0.25, 1.75),
@@ -40,13 +41,10 @@ export default function Model() {
   // Set the sky texture as the scene background
   scene.background = skyTexture;
 
-  // Create spring animation for the cloud ring
-  const cloudRingSpring = useSpring({
-    loop: true,
-    from: { rotation: [0, 0, 0] },
-    to: { rotation: [0, Math.PI * 2, 0] },
-    config: { duration: 10000 }, // Adjust duration for speed
-  });
+  const handleClick = (idx) => {
+    // Toggle the clicked pointer state to show or hide the dialog
+    setClickedPointer(clickedPointer === idx ? null : idx);
+  };
 
   return (
     <>
@@ -63,12 +61,35 @@ export default function Model() {
       >
         <primitive object={mountain.scene} /> {/* Render the mountain */}
         {pointerPositions.map((pos, idx) => (
-          <primitive
-            key={idx}
-            object={mapPointer.scene.clone()} // Clone the map pointer for each instance
-            position={pos} // Set pointer position
-            scale={[0.1, 0.1, 0.1]} // Keep the scale constant
-          />
+          <group key={idx} position={pos} onClick={() => handleClick(idx)}>
+            <primitive
+              object={mapPointer.scene.clone()} // Clone the map pointer for each instance
+              scale={[0.1, 0.1, 0.1]} // Keep the scale constant
+            />
+            {/* Show the dialog only when the pointer is clicked */}
+            {clickedPointer === idx && (
+              <Html distanceFactor={10} position={[0, 0.75, 0]}>
+                <div
+                  style={{
+                    background: "white",
+                    padding: "12px",
+                    borderRadius: "4px",
+                    boxShadow: "0px 0px 10px rgba(0,0,0,0.5)",
+                    width: "150px", // Narrower width
+                    height: "75px", // Taller height
+                    textAlign: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    fontSize: "10px",
+                  }}
+                >
+                  <p>Dialog for Goal {idx + 1}</p>
+                  <button onClick={() => setClickedPointer(null)}>Close</button>
+                </div>
+              </Html>
+            )}
+          </group>
         ))}
         {/* Tube */}
         <mesh>

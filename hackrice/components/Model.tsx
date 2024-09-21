@@ -18,7 +18,7 @@ export default function Model() {
   const mountain = useGLTF("/mountain.glb");
   const mapPointer = useGLTF("/mappointer.glb");
   const cloudRing = useGLTF("/clouds.glb");
-  const terrain = useGLTF("/terrain.glb");
+  const terrain = useGLTF("/forest.glb");
 
   const { scene, camera } = useThree(); // Get the camera reference
 
@@ -50,17 +50,17 @@ export default function Model() {
 
   return (
     <>
+      {/* Terrain Model */}
+      <primitive
+        object={terrain.scene}
+        position={[-1.65, -1.75, -1.4]}
+        scale={[0.75, 0.4, 0.75]}
+      />{" "}
       <animated.group
         ref={group}
         position={[-1.75, -1.75, 0]} // Adjust the position of the entire group (Mountain, Terrain, and Pointers)
         scale={[1.5, 1.5, 1.5]}
       >
-        {/* Terrain Model */}
-        <primitive
-          object={terrain.scene}
-          position={[0, 1.2, 0]}
-          scale={[50, 25, 50]}
-        />{" "}
         <primitive object={mountain.scene} /> {/* Render the mountain */}
         {pointerPositions.map((pos, idx) => (
           <primitive
@@ -76,11 +76,10 @@ export default function Model() {
           <meshBasicMaterial attach="material" color="yellow" />
         </mesh>
       </animated.group>
-
       <OrbitControls
         enablePan={true} // Enable panning
         minDistance={3} // Set a minimum distance (for zoom in)
-        maxDistance={15} // Set a maximum distance (for zoom out)
+        maxDistance={12} // Set a maximum distance (for zoom out)
         onChange={() => {
           camera.position.y = 2; // Set a fixed Y position for the camera (adjust as needed)
         }}

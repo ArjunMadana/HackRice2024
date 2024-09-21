@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
             "estimated_time_to_master": "string" // Approximate time to cover the topic
           }
     
-          Please ensure the response strictly follows the JSON format and provide clear, concise steps or subtopics.
+          Please ensure the response strictly follows the JSON format and provide clear, concise steps or subtopics. Do not include any additional comments.
           
           Now, respond according to the input provided: "${topic}"`,
         },
@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
     });
 
     const structuredResponse = chatCompletion.choices[0]?.message?.content;
+    console.log(structuredResponse)
 
     // Validate JSON response
     try {
@@ -68,7 +69,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       return NextResponse.json(
         { error: 'The response is not a valid JSON structure', response: structuredResponse },
-        { status: 500 }
+        { status: 422 }
       );
     }
   } catch (error) {

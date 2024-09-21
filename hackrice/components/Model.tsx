@@ -58,8 +58,8 @@ export default function Model() {
         {/* Terrain Model */}
         <primitive
           object={terrain.scene}
-          position={[0, 1.5, 0]}
-          scale={[50, 30, 50]}
+          position={[0, 1.2, 0]}
+          scale={[50, 25, 50]}
         />{" "}
         <primitive object={mountain.scene} /> {/* Render the mountain */}
         {pointerPositions.map((pos, idx) => (

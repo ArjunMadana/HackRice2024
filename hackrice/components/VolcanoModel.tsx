@@ -184,6 +184,7 @@ export default function Model() {
       console.error('Error updating goal:', error);
     }
   };
+
   const extractVideoID = (url) => {
     const urlObj = new URL(url);
     return urlObj.searchParams.get("v");
@@ -257,6 +258,11 @@ export default function Model() {
                       left: "10px",
                       }}
                     >
+                      <FaCheckCircle
+                      color={subtopics[idx].completed ? "blue" : "gray"}
+                      size={24}
+                      />
+                    </button>
                       <h2 className="heading-topic">
                         {subtopics[idx].subtopic}
                       </h2>

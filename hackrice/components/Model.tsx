@@ -28,13 +28,16 @@ export default function Model() {
   const [learningPath, setLearningPath] = useState([]);
   const [estimatedTime, setEstimatedTime] = useState("");
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [storedId, setStoredId] = useState("");
 
   useEffect(() => {
     const topicParam = searchParams.get("topic");
     const subtopicsParam = searchParams.get("subtopics");
     const learningPathParam = searchParams.get("learningPath");
     const estimatedTimeParam = searchParams.get("estimatedTime");
+    const storedId = searchParams.get("id");
 
+    if (storedId) setStoredId(storedId);
     if (topicParam) setTopic(topicParam);
     if (subtopicsParam) {
       try {
@@ -130,6 +133,62 @@ export default function Model() {
     handleClick(newIcon);
   };
 
+  const handleComplete = async (index) => {
+    try {
+      const response = await fetch('/api/goals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: storedId, index, action: 'increment' }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update goal');
+      }
+  
+      const updatedGoal = await response.json();
+      console.log('Goal updated successfully:', updatedGoal);
+  
+      // Update the state to reflect the change
+      setSubtopics((prevSubtopics) => {
+        const newSubtopics = [...prevSubtopics];
+        newSubtopics[index].completed = true;
+        return newSubtopics;
+      });
+    } catch (error) {
+      console.error('Error updating goal:', error);
+    }
+  };
+  
+  const handleIncomplete = async (index) => {
+    try {
+      const response = await fetch('/api/goals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: storedId, index, action: 'decrement' }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update goal');
+      }
+  
+      const updatedGoal = await response.json();
+      console.log('Goal updated successfully:', updatedGoal);
+  
+      // Update the state to reflect the change
+      setSubtopics((prevSubtopics) => {
+        const newSubtopics = [...prevSubtopics];
+        newSubtopics[index].completed = false;
+        return newSubtopics;
+      });
+    } catch (error) {
+      console.error('Error updating goal:', error);
+    }
+  };
+
   return (
     <>
       {/* Terrain Model */}
@@ -177,22 +236,24 @@ export default function Model() {
 
                     <button
                       onClick={() => {
-                        const updatedSubtopics = [...subtopics];
-                        updatedSubtopics[idx].completed = !updatedSubtopics[idx].completed;
-                        setSubtopics(updatedSubtopics);
+                      if (subtopics[idx].completed) {
+                        handleIncomplete(idx);
+                      } else {
+                        handleComplete(idx);
+                      }
                       }}
                       style={{
-                        background: "none",
-                        border: "none",
-                        cursor: "pointer",
-                        position: "absolute",
-                        top: "10px",
-                        left: "10px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      position: "absolute",
+                      top: "10px",
+                      left: "10px",
                       }}
                     >
                       <FaCheckCircle
-                        color={subtopics[idx].completed ? "blue" : "gray"}
-                        size={24}
+                      color={subtopics[idx].completed ? "blue" : "gray"}
+                      size={24}
                       />
                     </button>
 

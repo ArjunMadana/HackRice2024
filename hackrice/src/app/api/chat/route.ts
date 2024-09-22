@@ -64,7 +64,8 @@ export async function POST(req: NextRequest) {
               {
                 "subtopic": "string",
                 "details": "string", // Brief explanation of the subtopic
-                "recommended_resources": ["string"] // Suggestions to seach on youtube for further information
+                "recommended_resources": ["string"], // Suggestions to seach on youtube for further information
+                "completed": false // Indicate if the subtopic has been completed
               }
             ],
             "learning_path": ["string"], // Suggested learning order for the subtopics

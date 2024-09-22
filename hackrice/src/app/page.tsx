@@ -19,7 +19,6 @@ export default function Page() {
       try {
         const res = await fetch("/api/goals");
 
-
         if (!res.ok) {
           throw new Error(`Failed to fetch goals: ${res.status}`);
         }

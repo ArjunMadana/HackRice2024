@@ -58,40 +58,45 @@ export async function GET() {
 
 export async function PATCH(req: Request) {
   try {
-    const { db } = await connectToDatabase();
-    const body = await req.json();
-    const { id } = body;
+    const body = await req.json(); // Parse the request body
+    const { _id, index, action } = body;
 
-    // Validation: ensure all required fields are present
-    if (!id) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    // Validate _id
+    if (!_id || !ObjectId.isValid(_id)) {
+      return NextResponse.json({ error: "Invalid or missing _id" }, { status: 400 });
     }
 
-    // Update the goal's progress in the database by adding 12.5 to the current progress
+    // Connect to the MongoDB database
+    const { db } = await connectToDatabase();
+
+    // Determine the update operation based on the action
+    let updateOperation;
+    if (action === 'increment') {
+      updateOperation = { $inc: { progress: 12.5 }, $set: { [`subtopics.${index}.completed`]: true } };
+    } else if (action === 'decrement') {
+      updateOperation = { $inc: { progress: -12.5 }, $set: { [`subtopics.${index}.completed`]: false } };
+    } else {
+      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    }
+
+    // Update the progress of the goal with the given _id
     const result = await db.collection("goals").updateOne(
-      { _id: new ObjectId(id) },
-      { $inc: { progress: 12.5 } }
+      { _id: ObjectId.createFromHexString(_id) },
+      updateOperation
     );
 
+    // Check if the goal was found and updated
     if (result.matchedCount === 0) {
-      return NextResponse.json(
-        { error: "Goal not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Goal not found" }, { status: 404 });
     }
 
     // Fetch the updated goal
-    const updatedGoal = await db.collection("goals").findOne({ _id: new ObjectId(id) });
+    const updatedGoal = await db.collection("goals").findOne({ _id: ObjectId.createFromHexString(_id) });
 
+    // Return the updated goal
     return NextResponse.json(updatedGoal, { status: 200 });
   } catch (error) {
-    console.error("Failed to update progress:", error);
-    return NextResponse.json(
-      { error: "Failed to update progress" },
-      { status: 500 }
-    );
+    console.error("Error updating goal:", error);
+    return NextResponse.json({ error: "Failed to update goal" }, { status: 500 });
   }
 }

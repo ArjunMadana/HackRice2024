@@ -9,6 +9,7 @@ export default function Page() {
   const [query, setQuery] = useState<string | null>(null);
   const { reset } = useQueryErrorResetBoundary();
   const [goals, setGoals] = useState([]);
+  const [selectedEnvironment, setSelectedEnvironment] = useState("mountain"); // Set the default environment
 
   const router = useRouter();
 
@@ -17,12 +18,10 @@ export default function Page() {
       try {
         const res = await fetch("/api/goals");
 
-        // Check if the response is ok and has content
         if (!res.ok) {
           throw new Error(`Failed to fetch goals: ${res.status}`);
         }
 
-        // Handle cases where the response body is empty
         const text = await res.text();
         const data = text ? JSON.parse(text) : [];
 
@@ -55,6 +54,10 @@ export default function Page() {
     }
   };
 
+  const handleEnvironmentChange = (env: string) => {
+    setSelectedEnvironment(env); // Set the selected environment
+  };
+
   // Handle submission with Enter key
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && inputValue.trim() !== "") {
@@ -69,16 +72,12 @@ export default function Page() {
     }
   }, [inputValue, reset, isError]);
 
-  // Redirect to /mountain when data is successfully fetched
+  // Redirect to the selected environment with query params when data is successfully fetched
   useEffect(() => {
     if (data && !error) {
-      console.log("Full API Response:", data);
-
       const structuredResponse = data.structuredResponse;
-      console.log("Structured Response:", structuredResponse);
 
       if (structuredResponse) {
-        // Save the structured response to MongoDB
         const saveGoalToDatabase = async () => {
           try {
             const res = await fetch("/api/goals", {
@@ -99,8 +98,7 @@ export default function Page() {
             }
 
             const savedGoal = await res.json();
-            console.log("Saved Goal:", savedGoal);
-            setGoals((prevGoals) => [...prevGoals, savedGoal]); // Add saved goal to the state
+            setGoals((prevGoals) => [...prevGoals, savedGoal]);
           } catch (err) {
             console.error("Failed to save goal to the database:", err);
           }
@@ -115,13 +113,10 @@ export default function Page() {
           estimatedTime: structuredResponse.estimated_time_to_master,
         }).toString();
 
-        console.log("Query Params:", queryParams);
-        router.push(`/mountain?${queryParams}`);
-      } else {
-        console.error("structuredResponse is undefined in the API response");
+        router.push(`/${selectedEnvironment}?${queryParams}`);
       }
     }
-  }, [data, router, error]);
+  }, [data, router, error, selectedEnvironment]);
 
   return (
     <div className="h-screen flex flex-col pb-6 animated-slideshow">
@@ -129,12 +124,8 @@ export default function Page() {
         <div className="-mt-20 max-w-4xl w-full text-center mx-auto px-4 sm:px-6 lg:px-8">
           <img
             src="/goalscapes.png"
-            alt="Preline AI"
             style={{ width: "1000px", height: "475px" }}
-          />{" "}
-          {/* <p className="text-gray-600 dark:text-neutral-400">
-            Your AI-powered copilot for the web
-          </p> */}
+          />
         </div>
 
         {/* Search */}
@@ -144,7 +135,7 @@ export default function Page() {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown} // Handle Enter key press
+              onKeyDown={handleKeyDown}
               className="p-4 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
               placeholder="Break down your goal or topic..."
               disabled={isLoading}
@@ -203,10 +194,40 @@ export default function Page() {
             </div>
           </div>
         </div>
-        {/* End Search */}
 
-        {/* Display the API response, error, or loading state */}
-        {/* {data && <div className="mt-6 text-center">Response: {JSON.stringify(data)}</div>} */}
+        {/* Environment Selection Buttons */}
+        <div className="flex justify-center gap-4 mt-4">
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              selectedEnvironment === "mountain"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-300"
+            }`}
+            onClick={() => handleEnvironmentChange("mountain")}
+          >
+            Mountain
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              selectedEnvironment === "tokyotower"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-300"
+            }`}
+            onClick={() => handleEnvironmentChange("tokyotower")}
+          >
+            Tokyo Tower
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg ${
+              selectedEnvironment === "volcano"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-300"
+            }`}
+            onClick={() => handleEnvironmentChange("volcano")}
+          >
+            Volcano
+          </button>
+        </div>
 
         {/* Display error message */}
         {isError && error && (

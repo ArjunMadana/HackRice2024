@@ -137,7 +137,7 @@ export default function Page() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="p-4 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+              className="p-4 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
               placeholder="Break down your goal or topic..."
               disabled={isLoading}
             />
@@ -149,7 +149,7 @@ export default function Page() {
                   isLoading
                     ? "bg-gray-300 text-gray-500"
                     : "bg-gray-100 text-gray-500 hover:text-gray-800"
-                } focus:outline-none disabled:opacity-50 disabled:pointer-events-none dark:text-neutral-400 dark:bg-neutral-800 dark:hover:text-white dark:focus:text-white`}
+                } focus:outline-none disabled:opacity-50 disabled:pointer-events-none`}
                 disabled={isLoading || !inputValue}
               >
                 {isLoading ? (

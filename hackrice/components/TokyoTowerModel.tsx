@@ -128,6 +128,11 @@ export default function Model() {
     handleClick(newIcon);
   };
 
+  const extractVideoID = (url) => {
+    const urlObj = new URL(url);
+    return urlObj.searchParams.get("v");
+  };
+
   return (
     <>
       {/* Terrain Model */}
@@ -166,35 +171,51 @@ export default function Model() {
                     position: "fixed",
                     top: 0,
                     left: 0,
-                    width: "25vw",
+                    width: "40vw",
                     height: "25vh",
                   }}
                 >
-                  <div className="content-box">
-                    <button className="close-btn" onClick={handleClose}>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="25"
-                        height="25"
-                        fill="currentColor"
-                        class="bi bi-x"
-                        viewBox="0 0 16 16"
-                      >
-                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
-                      </svg>
-                    </button>
-                    <h2 className="heading-topic">{subtopics[idx].subtopic}</h2>
-                    <p className="details-text">{subtopics[idx].details}</p>
-                    <h4 className="heading-resources">
-                      Recommended Resources:
-                    </h4>
-                    <ul className="resource-list">
-                      {subtopics[idx].recommended_resources.map(
-                        (resource, index) => (
-                          <li key={index}>{resource}</li>
-                        )
-                      )}
-                    </ul>
+                  <div className="content-box flex">
+                    <div className="text-content">
+                      <button className="close-btn" onClick={handleClose}>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="25"
+                          height="25"
+                          fill="currentColor"
+                          className="bi bi-x"
+                          viewBox="0 0 16 16"
+                        >
+                          <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                        </svg>
+                      </button>
+                      <h2 className="heading-topic">
+                        {subtopics[idx].subtopic}
+                      </h2>
+                      <p className="details-text">{subtopics[idx].details}</p>
+                      <h4 className="heading-resources">
+                        Recommended Resources:
+                      </h4>
+                      <ul className="resource-list">
+                        {subtopics[idx].recommended_resources.map(
+                          (resource, index) => (
+                            <li key={index}>{resource}</li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                    <div className="video-content">
+                      <iframe
+                        width="100%"
+                        height="100%"
+                        src={`https://www.youtube.com/embed/${extractVideoID(
+                          subtopics[idx].link
+                        )}`}
+                        title="YouTube video player"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
+                    </div>
                   </div>
 
                   {currentIcon > 0 && (
@@ -230,6 +251,7 @@ export default function Model() {
                     </button>
                   )}
 
+                  {/* Conditionally render the "Next" arrow on the right */}
                   {currentIcon < pointerPositions.length && (
                     <button
                       onClick={handleNext}

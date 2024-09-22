@@ -1,53 +1,103 @@
 .content-box {
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 450px;
-    position: relative;
-  }
-  
-  .close-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 5px;
-    cursor: pointer;
-    position: absolute;
-    font-size: large;
-    top: -12px;
-    right: -15px; /* Positions the button in the top-left */
-    z-index: 1; /* Ensures the button stays above other content */
-  }
-  
-  .heading-topic {
-    font-size: 20px;
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  .details-text {
-    font-size: 16px;
-    margin-bottom: 10px;
-    text-align: center;
-    line-height: 1.4;
-  }
-  
-  .heading-resources {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .resource-list {
-    margin-bottom: 20px;
-    padding-left: 20px;
-    list-style-type: disc;
-  }
-  
-  .resource-list li {
-    margin-bottom: 5px;
-  }
-  
+  padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.text-content {
+  flex: 1; /* Make both the text and video take up 50% */
+  max-width: 60%; /* Ensure each content is exactly half */
+  text-align: start;
+}
+.video-content {
+  flex: 1; /* Make both the text and video take up 50% */
+  max-width: 40%; /* Ensure each content is exactly half */
+}
+
+.close-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 5px;
+  cursor: pointer;
+  position: absolute;
+  font-size: large;
+  top: -12px;
+  right: -15px; /* Positions the button in the top-left */
+  z-index: 1; /* Ensures the button stays above other content */
+}
+
+.heading-topic {
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.details-text {
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.heading-resources {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.resource-list {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.resource-list li {
+  margin-bottom: 5px;
+}
+
+.low-poly-button {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  background: linear-gradient(145deg, #3b3b3b, #1e1e1e);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  box-shadow: -5px -5px 10px rgba(255, 255, 255, 0.1),
+    5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.low-poly-button:before,
+.low-poly-button:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  top: 0;
+  left: 0;
+  transition: all 0.3s ease;
+}
+
+.low-poly-button:before {
+  clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 85%);
+  background: rgba(255, 255, 255, 0.2); /* Light highlight */
+}
+
+.low-poly-button:after {
+  clip-path: polygon(0 100%, 100% 100%, 100% 0, 15% 15%);
+  background: rgba(0, 0, 0, 0.2); /* Dark shadow */
+}
+
+.low-poly-button:hover {
+  background: linear-gradient(145deg, #4c4c4c, #2a2a2a);
+  transform: translateY(-5px); /* Lift the button */
+}

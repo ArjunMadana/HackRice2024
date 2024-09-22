@@ -1,13 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { FaCog, FaList, FaHome } from "react-icons/fa";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { Gi3dHammer  } from "react-icons/gi";
+import { useRouter } from "next/navigation";
+import { zip } from "three/examples/jsm/libs/fflate.module.js";
+
 
 const Heading: React.FC = () => {
-  const [hovered, setHovered] = useState<number | null>(null); // Track hovered button index
-  const [showListModal, setShowListModal] = useState(false); // Track if the list modal should be shown
-  const [showSettingsModal, setShowSettingsModal] = useState(false); // Track if the settings modal should be shown
-  const [goals, setGoals] = useState([]); // State to store fetched goals
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [showListModal, setShowListModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [goals, setGoals] = useState([]);
 
   const toggleListModal = () => {
     setShowListModal(!showListModal);
@@ -25,14 +28,13 @@ const Heading: React.FC = () => {
     setShowSettingsModal(false);
   };
 
-  // Fetch goals from the API
   useEffect(() => {
     const fetchGoals = async () => {
       if (showListModal) {
         try {
           const response = await fetch("/api/goals");
           const data = await response.json();
-          setGoals(data); // Set the fetched goals
+          setGoals(data);
         } catch (error) {
           console.error("Failed to fetch goals:", error);
         }
@@ -40,13 +42,11 @@ const Heading: React.FC = () => {
     };
 
     fetchGoals();
-  }, [showListModal]); // Re-run fetch when the modal is toggled
+  }, [showListModal]);
 
   const router = useRouter();
 
   const handleCardClick = (goal) => {
-    // Handle what happens when a card is clicked
-    //console.log("Card clicked:", goal);
     const queryParams = new URLSearchParams({
       topic: goal.topic,
       subtopics: JSON.stringify(goal.subtopics),
@@ -57,10 +57,6 @@ const Heading: React.FC = () => {
     router.push(`/${goal.environment}?${queryParams}`);
   };
 
-  useEffect(() => { 
-    
-  }, [router]);
-
   return (
     <div style={styles.container} className="mr-5">
       <button
@@ -69,7 +65,7 @@ const Heading: React.FC = () => {
         }
         onMouseEnter={() => setHovered(2)}
         onMouseLeave={() => setHovered(null)}
-        onClick={() => (window.location.href = "/")} // Navigate to home when clicked
+        onClick={() => (window.location.href = "/")}
       >
         <FaHome style={styles.icon} />
       </button>
@@ -80,7 +76,7 @@ const Heading: React.FC = () => {
         }
         onMouseEnter={() => setHovered(1)}
         onMouseLeave={() => setHovered(null)}
-        onClick={toggleListModal} // Toggle list modal visibility when the list icon is clicked
+        onClick={toggleListModal}
       >
         <FaList style={styles.icon} />
       </button>
@@ -88,7 +84,14 @@ const Heading: React.FC = () => {
       {showListModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <button onClick={closeListModal} style={styles.closeButton}>
+            <button
+              onClick={closeListModal}
+              style={styles.closeButton}
+              onMouseEnter={() =>
+                setHovered(3)
+              }
+              onMouseLeave={() => setHovered(null)}
+            >
               &times;
             </button>
             <h2
@@ -106,7 +109,17 @@ const Heading: React.FC = () => {
                   <div
                     key={index}
                     style={styles.card}
-                    onClick={() => handleCardClick(goal)} // Make the card clickable
+                    onClick={() => handleCardClick(goal)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "scale(1.01)";
+                      e.currentTarget.style.boxShadow =
+                        "0px 6px 14px rgba(0, 0, 0, 0.2)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.style.boxShadow =
+                        "0px 4px 12px rgba(0, 0, 0, 0.1)";
+                    }}
                   >
                     <div style={styles.cardContent}>
                       <div style={styles.goalName}>{goal.topic}</div>
@@ -114,7 +127,7 @@ const Heading: React.FC = () => {
                         <div
                           style={{
                             ...styles.progressBar,
-                            width: `${goal.progress}%`, // Set width based on progress
+                            width: `${goal.progress}%`,
                           }}
                         >
                           {goal.progress}%
@@ -137,15 +150,31 @@ const Heading: React.FC = () => {
         }
         onMouseEnter={() => setHovered(0)}
         onMouseLeave={() => setHovered(null)}
-        onClick={toggleSettingsModal} // Toggle settings modal visibility when the cog icon is clicked
+        onClick={toggleSettingsModal}
       >
         <FaCog style={styles.icon} />
+      </button>
+
+      <button
+        style={
+          hovered === 3 ? { ...styles.button, ...styles.hover } : styles.button
+        }
+        onMouseEnter={() => setHovered(3)}
+        onMouseLeave={() => setHovered(null)}
+        onClick={() => (window.location.href = "/house")}
+      >
+        <Gi3dHammer style={styles.icon} />
       </button>
 
       {showSettingsModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <button onClick={closeSettingsModal} style={styles.closeButton}>
+            <button
+              onClick={closeSettingsModal}
+              style={styles.closeButton}
+              onMouseEnter={() => setHovered(3)}
+              onMouseLeave={() => setHovered(null)}
+            >
               &times;
             </button>
             <h2>Settings</h2>
@@ -160,26 +189,26 @@ const Heading: React.FC = () => {
 const styles = {
   container: {
     display: "flex",
-    gap: "10px", // Adjust the gap between buttons if needed
+    gap: "10px",
   },
   button: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#007bff",
+    backgroundColor: "#148444",
     color: "white",
     border: "none",
     padding: "15px",
     borderRadius: "5px",
     cursor: "pointer",
-    transition: "all 0.2s ease-in-out", // Smooth transition for hover effects
+    transition: "all 0.2s ease-in-out",
   },
   hover: {
-    transform: "scale(1.1)", // Slightly increase size on hover
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)", // Add shadow effect
+    transform: "scale(1.1)",
+    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
   },
   icon: {
-    fontSize: "40px", // Adjust the size of the icon if needed
+    fontSize: "40px",
   },
   modalOverlay: {
     position: "fixed",
@@ -187,13 +216,13 @@ const styles = {
     left: 0,
     width: "100vw",
     height: "100vh",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
   },
   modalContent: {
-    position: "relative", // To position the close button within the modal
+    position: "relative",
     backgroundColor: "#fff",
     padding: "20px",
     borderRadius: "8px",
@@ -201,29 +230,28 @@ const styles = {
     textAlign: "center",
     width: "80%",
     height: "80%",
-    overflowY: "auto", // Allow scrolling when content overflows
+    overflowY: "auto",
   },
   closeButton: {
-    position: "absolute",
-    top: "10px",
-    left: "10px",
-    backgroundColor: "red", // Red background
-    color: "white", // White "X" icon
+    zIndex: 999,
+    position: "fixed",
+    top: "65px",
+    left: "135px",
+    backgroundColor: "red",
+    color: "white",
     border: "none",
-    fontSize: "24px",
+    fontSize: "30px",
     fontWeight: "bold",
-    borderRadius: "50%", // Circle button
-    width: "35px",
-    height: "35px",
+    borderRadius: "50%",
+    width: "50px",
+    height: "50px",
     cursor: "pointer",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    transition: "all 0.2s ease-in-out",
   },
   goalList: {
     display: "flex",
     flexDirection: "column",
-    gap: "15px", // Add space between cards
+    gap: "15px",
   },
   card: {
     display: "flex",
@@ -255,7 +283,7 @@ const styles = {
     backgroundColor: "#e0e0e0",
     borderRadius: "5px",
     overflow: "hidden",
-    height: "40px", // Increase the height of the progress bar container
+    height: "40px",
     marginLeft: "10px",
   },
   progressBar: {
@@ -263,8 +291,8 @@ const styles = {
     height: "100%",
     backgroundColor: "#76c7c0",
     textAlign: "center",
-    lineHeight: "40px", // Match this with the height to vertically center the text
-    fontWeight: "bold", // Optional: Make the text bold
+    lineHeight: "40px",
+    fontWeight: "bold",
   },
 };
 

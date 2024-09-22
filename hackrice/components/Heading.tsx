@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaCog, FaList } from "react-icons/fa";
+import { FaCog, FaList, FaHome } from "react-icons/fa";
 
 const Heading: React.FC = () => {
   const [hovered, setHovered] = useState<number | null>(null); // Track hovered button index
@@ -48,6 +48,17 @@ const Heading: React.FC = () => {
 
   return (
     <div style={styles.container} className="mr-5">
+      <button
+        style={
+          hovered === 2 ? { ...styles.button, ...styles.hover } : styles.button
+        }
+        onMouseEnter={() => setHovered(2)}
+        onMouseLeave={() => setHovered(null)}
+        onClick={() => (window.location.href = "/")} // Navigate to home when clicked
+      >
+        <FaHome style={styles.icon} />
+      </button>
+
       <button
         style={
           hovered === 1 ? { ...styles.button, ...styles.hover } : styles.button
@@ -229,15 +240,16 @@ const styles = {
     backgroundColor: "#e0e0e0",
     borderRadius: "5px",
     overflow: "hidden",
-    height: "20px",
+    height: "40px", // Increase the height of the progress bar container
     marginLeft: "10px",
   },
   progressBar: {
+    color: "black",
     height: "100%",
     backgroundColor: "#76c7c0",
     textAlign: "center",
-    lineHeight: "20px",
-    color: "white",
+    lineHeight: "40px", // Match this with the height to vertically center the text
+    fontWeight: "bold", // Optional: Make the text bold
   },
 };
 

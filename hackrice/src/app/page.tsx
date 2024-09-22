@@ -247,12 +247,6 @@ export default function Page() {
         )}
       </div>
 
-      <footer className="mt-auto max-w-4xl text-center mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-xs text-gray-600 dark:text-neutral-500">
-          HackRice 2024
-        </p>
-      </footer>
-
       <style jsx>{`
         .animated-slideshow {
           position: relative;

@@ -66,7 +66,7 @@ export default function Model() {
   }, [searchParams]);
 
   const pointerPositions = [
-    new Vector3(0.4, 0.3, 1.2),
+    new Vector3(0.4, 0.3, 0.8),
     new Vector3(1.3, 0.35, 1),
     new Vector3(1.3, 1, 0),
     new Vector3(0.6, 1.2, 0),
@@ -133,7 +133,7 @@ export default function Model() {
     const newCameraPos = [
       clickedPosition.x - 4, // Adjust the camera's target position relative to the clicked point
       clickedPosition.y + 4,
-      clickedPosition.z + 9.5,
+      clickedPosition.z + 9,
     ];
 
     api.start({ position: newCameraPos });

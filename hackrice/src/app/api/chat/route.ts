@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     });
 
     const structuredResponse = chatCompletion.choices[0]?.message?.content;
-    console.log(structuredResponse)
+    //console.log(structuredResponse)
 
     // Validate JSON response
     try {
@@ -95,13 +95,13 @@ export async function POST(req: NextRequest) {
           
           // Fetch the YouTube link for the selected resource
           const link = await fetchYouTubeLinks(randomResource);
-          console.log("thinky" + link);
+          //console.log("thinky" + link);
 
           // Add the link field to the subtopic
           subtopic.link = link ? link : null; 
         }
       }
-      console.log(jsonResponse)
+      //console.log(jsonResponse)
       return NextResponse.json({ structuredResponse: jsonResponse });
     } catch (error) {
       return NextResponse.json(

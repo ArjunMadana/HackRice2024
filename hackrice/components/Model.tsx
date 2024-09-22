@@ -6,6 +6,7 @@ import { useThree, useLoader, useFrame } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { useSpring, animated } from "@react-spring/three"; // Spring animation
 import { useSearchParams } from "next/navigation";
+import { FaCheckCircle } from "react-icons/fa";
 import "../styles/global.css";
 
 // Preload all models
@@ -173,6 +174,28 @@ export default function Model() {
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
                       </svg>
                     </button>
+
+                    <button
+                      onClick={() => {
+                        const updatedSubtopics = [...subtopics];
+                        updatedSubtopics[idx].completed = !updatedSubtopics[idx].completed;
+                        setSubtopics(updatedSubtopics);
+                      }}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        position: "absolute",
+                        top: "10px",
+                        left: "10px",
+                      }}
+                    >
+                      <FaCheckCircle
+                        color={subtopics[idx].completed ? "blue" : "gray"}
+                        size={24}
+                      />
+                    </button>
+
                     <h2 className="heading-topic">{subtopics[idx].subtopic}</h2>
                     <p className="details-text">{subtopics[idx].details}</p>
                     <h4 className="heading-resources">

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth0/nextjs-auth0": "^3.5.0",
     "@react-three/drei": "^9.0.1",
     "@react-three/fiber": "^8.17.7",
     "@react-three/postprocessing": "^2.16.2",

@@ -94,5 +94,5 @@ export default function HouseRender({
     }
   });
 
-  return <primitive object={scene} scale={[0.1, 0.1, 0.1]} ref={group} />;
+  return <primitive object={scene} scale={[.65, .65, .65]} ref={group} />;
 }

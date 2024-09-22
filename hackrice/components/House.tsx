@@ -3,11 +3,28 @@
 import { useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Suspense } from 'react';
-import { Sky } from '@react-three/drei'; // Sky for environmental lighting
-import * as THREE from 'three'; // Import THREE to use Scene types
+import { Sky, useGLTF } from '@react-three/drei'; // UseGLTF to load terrain
+import * as THREE from 'three'; // Import THREE for scene management
 import HouseRender from './HouseRender'; // Import the full house model
+import { CSSProperties } from 'react'; // Import CSSProperties for proper type
+
+// Load the Valley Terrain model and apply rotation and positioning
+function Terrain() {
+  const { scene } = useGLTF('/Valley Terrain.glb'); // Assuming this is the correct path
+  return (
+    <primitive
+      object={scene}
+      scale={[0.4, 0.4, 0.4]} // Increased scale for terrain to span full width
+      position={[0, -14, -30]} // Adjust the position to fit the screen better
+      rotation={[-Math.PI / 12, 0, 0]} // Adjust the tilt for better fit
+    />
+  );
+}
 
 export default function House() {
+  // State to track user points
+  const [points, setPoints] = useState(100); // Starting points
+
   // State variables for the visibility of each part
   const [isRoofVisible, setRoofVisible] = useState(false);
   const [isGarageVisible, setGarageVisible] = useState(false);
@@ -18,12 +35,31 @@ export default function House() {
   const [isWindowsVisible, setWindowsVisible] = useState(false);
   const [isSecondFloorVisible, setSecondFloorVisible] = useState(false);
 
+  // Handle purchase logic, preventing duplicate purchases
+  const handlePurchase = (
+    cost: number,
+    setVisible: React.Dispatch<React.SetStateAction<boolean>>,
+    isVisible: boolean
+  ) => {
+    if (isVisible) {
+      alert('You already bought this component!');
+      return;
+    }
+
+    if (points >= cost) {
+      setPoints((prev) => prev - cost);
+      setVisible(true);
+    } else {
+      alert("Not enough points to buy this component!");
+    }
+  };
+
   return (
     <>
-      {/* Main Canvas displaying the entire house */}
+      {/* Main Canvas displaying the entire house and terrain */}
       <Canvas
-        camera={{ position: [0, 2, 10], fov: 45 }}
-        style={{ width: '100%', height: '100vh' }}
+        camera={{ position: [0, 15, 30], fov: 45 }} // Adjust camera to fit the much larger house
+        style={{ width: '100%', height: '100vh', marginTop: '0' }} // Remove any white space by resetting margin and setting full height
       >
         <directionalLight position={[-1, -1, 1]} intensity={1} />
         <ambientLight intensity={1} />
@@ -34,6 +70,8 @@ export default function House() {
             inclination={0}
             azimuth={1}
           />
+          {/* Load Valley Terrain */}
+          <Terrain />
           <HouseRender
             isRoofVisible={isRoofVisible}
             isGarageVisible={isGarageVisible}
@@ -49,116 +87,98 @@ export default function House() {
 
       {/* Shop UI */}
       <div style={shopStyles.shopContainer}>
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Roof')}
-          onClick={() => setRoofVisible(!isRoofVisible)}
-          label={isRoofVisible ? 'Hide Roof' : 'Buy Roof'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Garage')}
-          onClick={() => setGarageVisible(!isGarageVisible)}
-          label={isGarageVisible ? 'Hide Garage' : 'Buy Garage'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Chimney')}
-          onClick={() => setChimneyVisible(!isChimneyVisible)}
-          label={isChimneyVisible ? 'Hide Chimney' : 'Buy Chimney'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Porch')}
-          onClick={() => setPorchVisible(!isPorchVisible)}
-          label={isPorchVisible ? 'Hide Porch' : 'Buy Porch'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Shed')}
-          onClick={() => setShedVisible(!isShedVisible)}
-          label={isShedVisible ? 'Hide Shed' : 'Buy Shed'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Balcony')}
-          onClick={() => setBalconyVisible(!isBalconyVisible)}
-          label={isBalconyVisible ? 'Hide Balcony' : 'Buy Balcony'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'Windows')}
-          onClick={() => setWindowsVisible(!isWindowsVisible)}
-          label={isWindowsVisible ? 'Hide Windows' : 'Buy Windows'}
-        />
-        <ShopSlot
-          extractPart={(scene: THREE.Scene) => findPartByName(scene, 'SecondFloor')}
-          onClick={() => setSecondFloorVisible(!isSecondFloorVisible)}
-          label={isSecondFloorVisible ? 'Hide Second Floor' : 'Buy Second Floor'}
-        />
+        <p style={shopStyles.points}>Points: {points}</p>
+        <div style={shopStyles.shopSlots}>
+          {/* Shop items in a 4x2 layout */}
+          <div style={shopStyles.row}>
+            <ShopSlot
+              onClick={() => handlePurchase(20, setRoofVisible, isRoofVisible)}
+              label="Buy Roof (20 Points)"
+              imageSrc="/Roof.png" // Custom image for Roof
+            />
+            <ShopSlot
+              onClick={() => handlePurchase(30, setGarageVisible, isGarageVisible)}
+              label="Buy Garage (30 Points)"
+              imageSrc="/Garage.png" // Custom image for Garage
+            />
+            <ShopSlot
+              onClick={() => handlePurchase(15, setChimneyVisible, isChimneyVisible)}
+              label="Buy Chimney (15 Points)"
+              imageSrc="/Chimney.png" // Custom image for Chimney
+            />
+            <ShopSlot
+              onClick={() => handlePurchase(25, setPorchVisible, isPorchVisible)}
+              label="Buy Porch (25 Points)"
+              imageSrc="/Porch.png" // Custom image for Porch
+            />
+          </div>
+          <div style={shopStyles.row}>
+            <ShopSlot
+              onClick={() => handlePurchase(10, setShedVisible, isShedVisible)}
+              label="Buy Shed (10 Points)"
+              imageSrc="/Shed.png" // Custom image for Shed
+            />
+            <ShopSlot
+              onClick={() => handlePurchase(30, setBalconyVisible, isBalconyVisible)}
+              label="Buy Balcony (30 Points)"
+              imageSrc="/Balcony.png" // Custom image for Balcony
+            />
+            <ShopSlot
+              onClick={() => handlePurchase(20, setWindowsVisible, isWindowsVisible)}
+              label="Buy Windows (20 Points)"
+              imageSrc="/Window.png" // Custom image for Windows
+            />
+            <ShopSlot
+              onClick={() => handlePurchase(40, setSecondFloorVisible, isSecondFloorVisible)}
+              label="Buy Second Floor (40 Points)"
+              imageSrc="/SecondFloor.png" // Custom image for Second Floor
+            />
+          </div>
+        </div>
       </div>
     </>
   );
 }
 
-// A recursive function to find nested parts by name
-function findPartByName(object: THREE.Object3D, name: string): THREE.Object3D | null {
-  if (object.name === name) {
-    return object;
-  }
-
-  for (const child of object.children) {
-    const result = findPartByName(child, name);
-    if (result) return result;
-  }
-
-  return null;
-}
-
-// A shop slot that contains a 3D rendered component and a buy button
+// A shop slot component for displaying the label and handling the buy action with an image
 function ShopSlot({
-  extractPart,
   onClick,
   label,
+  imageSrc,
 }: {
-  extractPart: (scene: THREE.Scene) => THREE.Object3D | null;
   onClick: () => void;
   label: string;
+  imageSrc: string;
 }) {
+  const imageStyle: CSSProperties = {
+    width: '70px', // Further reduced size for more compact shop
+    height: '70px',
+    objectFit: 'contain' as const, // Change from 'cover' to 'contain' for better fit
+    marginBottom: '8px', // Smaller margin
+    borderRadius: '6px', // Smaller rounded corners
+    border: '2px solid #00008B', // Dark blue border
+    boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.1)', // Slightly reduced shadow for compactness
+  };
+
+  const buttonStyle: CSSProperties = {
+    backgroundColor: '#00008B', // Dark blue theme
+    color: '#fff', // White text
+    padding: '5px 8px', // Smaller buttons to match reduced shop size
+    border: 'none',
+    borderRadius: '6px', // Smaller border radius
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '12px', // Smaller font size
+    transition: 'background-color 0.3s',
+  };
+
   return (
     <div style={shopStyles.slot}>
-      <Canvas
-        style={shopStyles.canvas}
-        camera={{ position: [0, 0, 3], fov: 50 }}
-        onCreated={({ gl }) => gl.setClearColor('transparent')}
-      >
-        {/* Add some lighting */}
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[2, 2, 2]} intensity={0.8} />
-        <Suspense fallback={null}>
-          <ExtractedPart extractPart={extractPart} />
-        </Suspense>
-      </Canvas>
-      <button onClick={onClick}>{label}</button>
+      <img src={imageSrc} alt={label} style={imageStyle} />
+      <button onClick={onClick} style={buttonStyle}>
+        {label}
+      </button>
     </div>
-  );
-}
-
-// A component that extracts and renders a specific part of the house
-function ExtractedPart({ extractPart }: { extractPart: (scene: THREE.Scene) => THREE.Object3D | null }) {
-  const { scene } = useThree();
-
-  // Log the entire scene structure for debugging purposes
-  console.log('Scene structure:', scene);
-
-  const part = extractPart(scene);
-
-  // Log only if no part is found for debugging
-  if (!part) {
-    console.log('Part not found:', part);
-  }
-
-  // If the part is found, clone and render it; if not, render a fallback cube
-  return part ? (
-    <primitive object={part.clone()} />
-  ) : (
-    <mesh>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="red" />
-    </mesh>
   );
 }
 
@@ -166,25 +186,37 @@ function ExtractedPart({ extractPart }: { extractPart: (scene: THREE.Scene) => T
 const shopStyles = {
   shopContainer: {
     position: 'absolute' as 'absolute',
-    bottom: '20px',
+    bottom: '15px', // Reduce space from bottom
     left: '50%',
     transform: 'translateX(-50%)',
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '20px',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    padding: '10px',
-    borderRadius: '12px',
+    width: '60%', // Further reduce overall width for smaller shop
+    padding: '12px', // Smaller padding
+    backgroundColor: 'rgba(173, 216, 230, 0.95)', // Light blue with slight transparency
+    boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.1)', // Subtle shadow
+    borderRadius: '10px', // Slightly reduced border radius
     zIndex: 1000,
+  },
+  points: {
+    textAlign: 'center' as 'center',
+    fontWeight: 'bold' as 'bold',
+    fontSize: '14px', // Slightly smaller text
+    marginBottom: '8px', // Reduce bottom margin
+  },
+  shopSlots: {
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    justifyContent: 'space-between' as 'space-between',
+    alignItems: 'center', // Align items in the center
+  },
+  row: {
+    display: 'flex',
+    justifyContent: 'space-evenly' as 'space-evenly', // Ensure even spacing
+    marginBottom: '10px', // Reduce spacing between rows
+    width: '100%',
   },
   slot: {
     display: 'flex',
     flexDirection: 'column' as 'column',
     alignItems: 'center',
-    gap: '10px',
-  },
-  canvas: {
-    width: '100px',
-    height: '100px',
   },
 };

@@ -198,7 +198,7 @@ export default function Page() {
         {/* Environment Selection Buttons */}
         <div className="flex justify-center gap-4 mt-4">
           <button
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "mountain"
                 ? "bg-blue-500 text-white"
                 : "bg-gray-300"
@@ -208,7 +208,7 @@ export default function Page() {
             Mountain
           </button>
           <button
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "tokyotower"
                 ? "bg-blue-500 text-white"
                 : "bg-gray-300"
@@ -218,7 +218,7 @@ export default function Page() {
             Tokyo Tower
           </button>
           <button
-            className={`px-4 py-2 rounded-lg ${
+            className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "volcano"
                 ? "bg-blue-500 text-white"
                 : "bg-gray-300"
@@ -226,6 +226,16 @@ export default function Page() {
             onClick={() => handleEnvironmentChange("volcano")}
           >
             Volcano
+          </button>
+          <button
+            className={`px-6 py-4 rounded-lg ${
+              selectedEnvironment === "hikingtrail"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-300"
+            }`}
+            onClick={() => handleEnvironmentChange("hikingtrail")}
+          >
+            Hiking Trail
           </button>
         </div>
 

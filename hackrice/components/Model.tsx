@@ -28,11 +28,6 @@ export default function Model() {
   const [estimatedTime, setEstimatedTime] = useState("");
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  console.log("Topic:", topic);
-  console.log("Subtopics:", subtopics);
-  console.log("Learning Path:", learningPath);
-  console.log("Estimated Time:", estimatedTime);
-
   useEffect(() => {
     const topicParam = searchParams.get("topic");
     const subtopicsParam = searchParams.get("subtopics");

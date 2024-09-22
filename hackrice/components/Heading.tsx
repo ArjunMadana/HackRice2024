@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { FaCog, FaList, FaHome } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { zip } from "three/examples/jsm/libs/fflate.module.js";
 
 const Heading: React.FC = () => {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -218,17 +219,18 @@ const styles = {
     overflowY: "auto",
   },
   closeButton: {
-    position: "absolute",
-    top: "10px",
-    left: "10px",
+    zIndex: 999,
+    position: "fixed",
+    top: "65px",
+    left: "135px",
     backgroundColor: "red",
     color: "white",
     border: "none",
-    fontSize: "24px",
+    fontSize: "30px",
     fontWeight: "bold",
     borderRadius: "50%",
-    width: "35px",
-    height: "35px",
+    width: "50px",
+    height: "50px",
     cursor: "pointer",
     transition: "all 0.2s ease-in-out",
   },

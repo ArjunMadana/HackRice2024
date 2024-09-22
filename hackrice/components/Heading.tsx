@@ -52,6 +52,7 @@ const Heading: React.FC = () => {
       subtopics: JSON.stringify(goal.subtopics),
       learningPath: JSON.stringify(goal.learning_path),
       estimatedTime: goal.estimated_time_to_master,
+      id: goal._id
     }).toString();
     router.push(`/${goal.environment}?${queryParams}`);
   };

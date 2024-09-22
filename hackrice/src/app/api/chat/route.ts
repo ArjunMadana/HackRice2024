@@ -64,7 +64,8 @@ export async function POST(req: NextRequest) {
               {
                 "subtopic": "string",
                 "details": "string", // Brief explanation of the subtopic
-                "recommended_resources": ["string"] // Suggestions to seach on youtube for further information
+                "recommended_resources": ["string"], // Suggestions to seach on youtube for further information
+                "completed": false // Indicate if the subtopic has been completed
               }
             ],
             "learning_path": ["string"], // Suggested learning order for the subtopics
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
     });
 
     const structuredResponse = chatCompletion.choices[0]?.message?.content;
-    console.log(structuredResponse)
+    //console.log(structuredResponse)
 
     // Validate JSON response
     try {
@@ -95,13 +96,13 @@ export async function POST(req: NextRequest) {
           
           // Fetch the YouTube link for the selected resource
           const link = await fetchYouTubeLinks(randomResource);
-          console.log("thinky" + link);
+          //console.log("thinky" + link);
 
           // Add the link field to the subtopic
           subtopic.link = link ? link : null; 
         }
       }
-      console.log(jsonResponse)
+      //console.log(jsonResponse)
       return NextResponse.json({ structuredResponse: jsonResponse });
     } catch (error) {
       return NextResponse.json(

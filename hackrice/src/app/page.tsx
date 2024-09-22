@@ -12,6 +12,7 @@ export default function Page() {
   const { reset } = useQueryErrorResetBoundary();
   const [goals, setGoals] = useState([]);
   const [selectedEnvironment, setSelectedEnvironment] = useState("mountain"); // Set the default environment
+  const [storedId, setStoredId] = useState("");
   const { user, error: userError, isLoading: isUserLoading } = useUser();
 
   const router = useRouter();
@@ -77,47 +78,49 @@ export default function Page() {
 
   // Redirect to the selected environment with query params when data is successfully fetched
   useEffect(() => {
-    if (data && !error) {
-      const structuredResponse = data.structuredResponse;
+  if (data && !error) {
+    const structuredResponse = data.structuredResponse;
 
-      if (structuredResponse) {
-        const saveGoalToDatabase = async () => {
-          try {
-            const res = await fetch("/api/goals", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                topic: structuredResponse.topic,
-                subtopics: structuredResponse.subtopics,
-                learningPath: structuredResponse.learning_path,
-                estimatedTime: structuredResponse.estimated_time_to_master,
-                environment: selectedEnvironment,
-              }),
-            });
+    if (structuredResponse) {
+      const saveGoalToDatabase = async () => {
+        try {
+          const res = await fetch("/api/goals", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              topic: structuredResponse.topic,
+              subtopics: structuredResponse.subtopics,
+              learningPath: structuredResponse.learning_path,
+              estimatedTime: structuredResponse.estimated_time_to_master,
+              environment: selectedEnvironment,
+            }),
+          });
 
-            if (!res.ok) {
-              throw new Error(`Error saving goal: ${res.status}`);
-            }
-
-            const savedGoal = await res.json();
-            setGoals((prevGoals) => [...prevGoals, savedGoal]);
-          } catch (err) {
-            console.error("Failed to save goal to the database:", err);
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
           }
-        };
 
-        saveGoalToDatabase();
+          const savedGoal = await res.json();
+          console.log("Saved goal:", savedGoal._id);
+          setStoredId(savedGoal._id);
+          setGoals((prevGoals) => [...prevGoals, savedGoal]);
+          const queryParams = new URLSearchParams({
+            topic: structuredResponse.topic,
+            subtopics: JSON.stringify(structuredResponse.subtopics),
+            learningPath: JSON.stringify(structuredResponse.learning_path),
+            estimatedTime: structuredResponse.estimated_time_to_master,
+            id: savedGoal._id || '',
+          }).toString();
+  
+          router.push(`/${selectedEnvironment}?${queryParams}`);
+        } catch (err) {
+          console.error("Failed to save goal to the database:", err);
+        }
+      };
 
-        const queryParams = new URLSearchParams({
-          topic: structuredResponse.topic,
-          subtopics: JSON.stringify(structuredResponse.subtopics),
-          learningPath: JSON.stringify(structuredResponse.learning_path),
-          estimatedTime: structuredResponse.estimated_time_to_master,
-        }).toString();
-
-        router.push(`/${selectedEnvironment}?${queryParams}`);
+      saveGoalToDatabase();
       }
     }
   }, [data, router, error, selectedEnvironment]);

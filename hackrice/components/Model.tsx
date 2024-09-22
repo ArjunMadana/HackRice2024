@@ -1,9 +1,12 @@
+"use client";
 import { useGLTF, OrbitControls, Html } from "@react-three/drei";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Group, Vector3, CatmullRomCurve3 } from "three";
 import { useThree, useLoader, useFrame } from "@react-three/fiber";
 import { TextureLoader } from "three";
 import { useSpring, animated } from "@react-spring/three"; // Spring animation
+import { useSearchParams } from "next/navigation";
+import "../styles/global.css";
 
 // Preload all models
 useGLTF.preload("/mountain.glb");
@@ -17,6 +20,42 @@ export default function Model() {
   const mapPointer = useGLTF("/mappointer.glb");
   const cloudRing = useGLTF("/clouds.glb");
   const terrain = useGLTF("/forest.glb");
+
+  const searchParams = useSearchParams();
+  const [topic, setTopic] = useState("");
+  const [subtopics, setSubtopics] = useState([]);
+  const [learningPath, setLearningPath] = useState([]);
+  const [estimatedTime, setEstimatedTime] = useState("");
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  useEffect(() => {
+    const topicParam = searchParams.get("topic");
+    const subtopicsParam = searchParams.get("subtopics");
+    const learningPathParam = searchParams.get("learningPath");
+    const estimatedTimeParam = searchParams.get("estimatedTime");
+
+    if (topicParam) setTopic(topicParam);
+    if (subtopicsParam) {
+      try {
+        const parsedSubtopics = JSON.parse(subtopicsParam);
+        setSubtopics(parsedSubtopics);
+      } catch (error) {
+        console.error("Error parsing subtopics:", error);
+        setSubtopics([]);
+      }
+    }
+    if (learningPathParam) {
+      try {
+        setLearningPath(JSON.parse(learningPathParam));
+      } catch (error) {
+        console.error("Error parsing learning path:", error);
+        setLearningPath([]);
+      }
+    }
+    if (estimatedTimeParam) setEstimatedTime(estimatedTimeParam);
+
+    setIsDataLoaded(true);
+  }, [searchParams]);
 
   const group = useRef<Group>(null);
   const { scene, camera } = useThree(); // Get the camera reference
@@ -60,7 +99,6 @@ export default function Model() {
     setClickedPointer(clickedPointer === idx ? null : idx);
     setCurrentIcon(idx);
 
-    // Get the clicked pointer's position and adjust the camera target
     const clickedPosition = pointerPositions[idx];
     const newCameraPos = [
       clickedPosition.x - 4, // Adjust the camera's target position relative to the clicked point
@@ -68,18 +106,15 @@ export default function Model() {
       clickedPosition.z + 8,
     ];
 
-    // Start spring animation to move the camera to the new position
     api.start({ position: newCameraPos });
   };
 
   const handleClose = () => {
     setClickedPointer(null); // Close the dialog
 
-    // Reset camera position to [0, 0, 5] (adjust as needed)
     api.start({ position: [0, 2, 10] });
   };
 
-  // Handle left arrow click to go to the previous icon
   const handlePrevious = () => {
     const newIcon =
       currentIcon === 0 ? pointerPositions.length - 1 : currentIcon - 1;
@@ -87,7 +122,6 @@ export default function Model() {
     handleClick(newIcon);
   };
 
-  // Handle right arrow click to go to the next icon
   const handleNext = () => {
     const newIcon =
       currentIcon === pointerPositions.length - 1 ? 0 : currentIcon + 1;
@@ -115,7 +149,6 @@ export default function Model() {
               object={mapPointer.scene.clone()} // Clone the map pointer for each instance
               scale={[0.1, 0.1, 0.1]} // Keep the scale constant
             />
-            {/* Show the dialog only when the pointer is clicked */}
             {clickedPointer === idx && (
               <Html>
                 <div
@@ -125,18 +158,35 @@ export default function Model() {
                     left: 0,
                     width: "25vw",
                     height: "25vh",
-                    backgroundColor: "white", // The entire dialog is now white
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 1000,
-                    borderRadius: "10px", // Optional: Rounded corners
-                    boxShadow: "0px 0px 10px rgba(0,0,0,0.5)", // Optional: Subtle shadow for better visibility
-                    textAlign: "center",
-                    position: "relative", // Allow positioning of the arrows
                   }}
                 >
-                  {/* Conditionally render the "Previous" arrow on the left */}
+                  <div className="content-box">
+                    <button className="close-btn" onClick={handleClose}>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="25"
+                        height="25"
+                        fill="currentColor"
+                        className="bi bi-x"
+                        viewBox="0 0 16 16"
+                      >
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
+                      </svg>
+                    </button>
+                    <h2 className="heading-topic">{subtopics[idx].subtopic}</h2>
+                    <p className="details-text">{subtopics[idx].details}</p>
+                    <h4 className="heading-resources">
+                      Recommended Resources:
+                    </h4>
+                    <ul className="resource-list">
+                      {subtopics[idx].recommended_resources.map(
+                        (resource, index) => (
+                          <li key={index}>{resource}</li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+
                   {currentIcon > 0 && (
                     <button
                       onClick={handlePrevious}
@@ -159,7 +209,7 @@ export default function Model() {
                         width="16"
                         height="16"
                         fill="currentColor"
-                        class="bi bi-arrow-left"
+                        className="bi bi-arrow-left"
                         viewBox="0 0 16 16"
                       >
                         <path
@@ -170,28 +220,8 @@ export default function Model() {
                     </button>
                   )}
 
-                  <div>
-                    <p style={{ fontSize: "18px", margin: "0 0 20px 0" }}>
-                      Dialog for Goal {currentIcon + 1}
-                    </p>
-                    <button
-                      onClick={handleClose}
-                      style={{
-                        padding: "10px 20px",
-                        backgroundColor: "#007bff",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                        marginTop: "10px",
-                      }}
-                    >
-                      Close
-                    </button>
-                  </div>
-
                   {/* Conditionally render the "Next" arrow on the right */}
-                  {currentIcon < pointerPositions.length - 1 && (
+                  {currentIcon < pointerPositions.length && (
                     <button
                       onClick={handleNext}
                       style={{
@@ -213,7 +243,7 @@ export default function Model() {
                         width="16"
                         height="16"
                         fill="currentColor"
-                        class="bi bi-arrow-right"
+                        className="bi bi-arrow-right"
                         viewBox="0 0 16 16"
                       >
                         <path
@@ -234,14 +264,6 @@ export default function Model() {
           <meshBasicMaterial attach="material" color="yellow" />
         </mesh>
       </animated.group>
-      <OrbitControls
-        enablePan={true} // Enable panning
-        minDistance={3} // Set a minimum distance (for zoom in)
-        maxDistance={12} // Set a maximum distance (for zoom out)
-        onChange={() => {
-          camera.position.y = 2; // Set a fixed Y position for the camera (adjust as needed)
-        }}
-      />
     </>
   );
 }

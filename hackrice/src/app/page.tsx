@@ -125,13 +125,12 @@ export default function Page() {
       <div className="h-full flex flex-col justify-center">
         <div className="-mt-20 max-w-4xl w-full text-center mx-auto px-4 sm:px-6 lg:px-8">
           <img
-            src="/goalscapes.png"
-            style={{ width: "1000px", height: "475px" }}
+            src="/logo.png"
           />
         </div>
 
         {/* Search */}
-        <div className="-mt-10 max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl w-full mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative">
             <input
               type="text"

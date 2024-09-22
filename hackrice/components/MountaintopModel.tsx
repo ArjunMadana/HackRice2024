@@ -6,6 +6,7 @@ import { TextureLoader } from "three";
 import { useSpring, animated } from "@react-spring/three"; // Spring animation
 import * as THREE from "three";
 import { useSearchParams } from "next/navigation";
+import { FaCheckCircle } from "react-icons/fa";
 import "../styles/global.css";
 
 // Preload all models
@@ -35,13 +36,16 @@ export default function Model() {
   const [learningPath, setLearningPath] = useState([]);
   const [estimatedTime, setEstimatedTime] = useState("");
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [storedId, setStoredId] = useState("");
 
   useEffect(() => {
     const topicParam = searchParams.get("topic");
     const subtopicsParam = searchParams.get("subtopics");
     const learningPathParam = searchParams.get("learningPath");
     const estimatedTimeParam = searchParams.get("estimatedTime");
+    const storedId = searchParams.get("id");
 
+    if (storedId) setStoredId(storedId);
     if (topicParam) setTopic(topicParam);
     if (subtopicsParam) {
       try {
@@ -158,6 +162,61 @@ export default function Model() {
     setCurrentIcon(newIcon);
     handleClick(newIcon);
   };
+  const handleComplete = async (index) => {
+    try {
+      const response = await fetch('/api/goals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: storedId, index, action: 'increment' }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update goal');
+      }
+  
+      const updatedGoal = await response.json();
+      console.log('Goal updated successfully:', updatedGoal);
+  
+      // Update the state to reflect the change
+      setSubtopics((prevSubtopics) => {
+        const newSubtopics = [...prevSubtopics];
+        newSubtopics[index].completed = true;
+        return newSubtopics;
+      });
+    } catch (error) {
+      console.error('Error updating goal:', error);
+    }
+  };
+  
+  const handleIncomplete = async (index) => {
+    try {
+      const response = await fetch('/api/goals', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: storedId, index, action: 'decrement' }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update goal');
+      }
+  
+      const updatedGoal = await response.json();
+      console.log('Goal updated successfully:', updatedGoal);
+  
+      // Update the state to reflect the change
+      setSubtopics((prevSubtopics) => {
+        const newSubtopics = [...prevSubtopics];
+        newSubtopics[index].completed = false;
+        return newSubtopics;
+      });
+    } catch (error) {
+      console.error('Error updating goal:', error);
+    }
+  };
 
   return (
     <>
@@ -211,6 +270,30 @@ export default function Model() {
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708" />
                       </svg>
                     </button>
+
+                    <button
+                      onClick={() => {
+                      if (subtopics[idx].completed) {
+                        handleIncomplete(idx);
+                      } else {
+                        handleComplete(idx);
+                      }
+                      }}
+                      style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      position: "absolute",
+                      top: "10px",
+                      left: "10px",
+                      }}
+                    >
+                      <FaCheckCircle
+                      color={subtopics[idx].completed ? "blue" : "gray"}
+                      size={24}
+                      />
+                    </button>
+
                     <h2 className="heading-topic">{subtopics[idx].subtopic}</h2>
                     <p className="details-text">{subtopics[idx].details}</p>
                     <h4 className="heading-resources">

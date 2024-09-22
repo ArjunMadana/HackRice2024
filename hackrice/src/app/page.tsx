@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryErrorResetBoundary } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { IoEnter } from "react-icons/io5";
 
 export default function Page() {
   const [inputValue, setInputValue] = useState("");
@@ -137,7 +138,7 @@ export default function Page() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="p-4 block w-full border-gray-200 rounded-full text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none"
+              className="p-4 block w-full border-gray-200 rounded-full text-sm focus:border-green-700 focus:ring-green-700 disabled:opacity-50 disabled:pointer-events-none"
               placeholder="Break down your goal or topic..."
               disabled={isLoading}
             />
@@ -174,22 +175,7 @@ export default function Page() {
                     ></path>
                   </svg>
                 ) : (
-                  <svg
-                    className="shrink-0 size-4"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-                    <path d="M12 12v9" />
-                    <path d="m16 16-4-4-4 4" />
-                  </svg>
+                  <IoEnter fontSize={25}/>
                 )}
               </button>
             </div>
@@ -201,7 +187,7 @@ export default function Page() {
           <button
             className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "mountain"
-                ? "bg-blue-500 text-white"
+                ? "bg-green-700 text-white"
                 : "bg-gray-300"
             }`}
             onClick={() => handleEnvironmentChange("mountain")}
@@ -211,7 +197,7 @@ export default function Page() {
           <button
             className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "tokyotower"
-                ? "bg-blue-500 text-white"
+                ? "bg-green-700 text-white"
                 : "bg-gray-300"
             }`}
             onClick={() => handleEnvironmentChange("tokyotower")}
@@ -221,7 +207,7 @@ export default function Page() {
           <button
             className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "volcano"
-                ? "bg-blue-500 text-white"
+                ? "bg-green-700 text-white"
                 : "bg-gray-300"
             }`}
             onClick={() => handleEnvironmentChange("volcano")}
@@ -231,7 +217,7 @@ export default function Page() {
           <button
             className={`px-6 py-4 rounded-lg ${
               selectedEnvironment === "hikingtrail"
-                ? "bg-blue-500 text-white"
+                ? "bg-green-700 text-white"
                 : "bg-gray-300"
             }`}
             onClick={() => handleEnvironmentChange("hikingtrail")}

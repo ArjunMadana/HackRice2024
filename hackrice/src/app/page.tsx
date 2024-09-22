@@ -90,6 +90,7 @@ export default function Page() {
                 subtopics: structuredResponse.subtopics,
                 learningPath: structuredResponse.learning_path,
                 estimatedTime: structuredResponse.estimated_time_to_master,
+                environment: selectedEnvironment,
               }),
             });
 

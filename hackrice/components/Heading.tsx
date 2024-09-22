@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { FaCog, FaList, FaHome } from "react-icons/fa";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
 
 const Heading: React.FC = () => {
   const [hovered, setHovered] = useState<number | null>(null); // Track hovered button index
@@ -41,10 +42,23 @@ const Heading: React.FC = () => {
     fetchGoals();
   }, [showListModal]); // Re-run fetch when the modal is toggled
 
+  const router = useRouter();
+
   const handleCardClick = (goal) => {
     // Handle what happens when a card is clicked
-    console.log("Card clicked:", goal);
+    //console.log("Card clicked:", goal);
+    const queryParams = new URLSearchParams({
+      topic: goal.topic,
+      subtopics: JSON.stringify(goal.subtopics),
+      learningPath: JSON.stringify(goal.learning_path),
+      estimatedTime: goal.estimated_time_to_master,
+    }).toString();
+    router.push(`/${goal.environment}?${queryParams}`);
   };
+
+  useEffect(() => { 
+    
+  }, [router]);
 
   return (
     <div style={styles.container} className="mr-5">

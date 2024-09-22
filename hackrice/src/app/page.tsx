@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryErrorResetBoundary } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 export default function Page() {
   const [inputValue, setInputValue] = useState("");
@@ -10,6 +11,7 @@ export default function Page() {
   const { reset } = useQueryErrorResetBoundary();
   const [goals, setGoals] = useState([]);
   const [selectedEnvironment, setSelectedEnvironment] = useState("mountain"); // Set the default environment
+  const { user, error: userError, isLoading: isUserLoading } = useUser();
 
   const router = useRouter();
 
@@ -118,9 +120,30 @@ export default function Page() {
       }
     }
   }, [data, router, error, selectedEnvironment]);
-
   return (
     <div className="h-screen flex flex-col pb-6 animated-slideshow">
+      <div className="absolute bottom-4 left-4">
+        {isUserLoading ? (
+          <div>Loading...</div>
+        ) : user ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">Welcome, {user.name || user.email}!</span>
+            <a
+              href="/api/auth/logout"
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+            >
+              Logout
+            </a>
+          </div>
+        ) : (
+          <a
+            href="/api/auth/login"
+            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+          >
+            Login
+          </a>
+        )}
+      </div>
       <div className="h-full flex flex-col justify-center">
         <div className="-mt-20 max-w-4xl w-full text-center mx-auto px-4 sm:px-6 lg:px-8">
           <img

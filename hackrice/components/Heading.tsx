@@ -1,8 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { FaCog, FaList, FaHome } from "react-icons/fa";
+import { Gi3dHammer  } from "react-icons/gi";
 import { useRouter } from "next/navigation";
 import { zip } from "three/examples/jsm/libs/fflate.module.js";
+
 
 const Heading: React.FC = () => {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -150,6 +152,17 @@ const Heading: React.FC = () => {
         onClick={toggleSettingsModal}
       >
         <FaCog style={styles.icon} />
+      </button>
+
+      <button
+        style={
+          hovered === 3 ? { ...styles.button, ...styles.hover } : styles.button
+        }
+        onMouseEnter={() => setHovered(3)}
+        onMouseLeave={() => setHovered(null)}
+        onClick={() => (window.location.href = "/house")}
+      >
+        <Gi3dHammer style={styles.icon} />
       </button>
 
       {showSettingsModal && (
